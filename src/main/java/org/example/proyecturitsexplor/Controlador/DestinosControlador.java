@@ -20,13 +20,22 @@ public class DestinosControlador {
 
     //CRUD
     @PostMapping("/destinos/guardarDestinos")
-    public ResponseEntity<Destinos>guardarDestino(@RequestBody Destinos destinos) {
-        if (destinos.getDestinoName()==null || destinos.getDescripcion()==null || destinos.getAtraccionesPrincipales()==null){
-            return  ResponseEntity.badRequest().build();
+    public ResponseEntity<Destinos> guardarDestinos(@RequestBody Destinos destinos) {
+        if (destinos.getDestinoName() == null || destinos.getDescripcion() == null ||
+                destinos.getUbicacion() == null || destinos.getFechaCreacion() == null || destinos.getFechaActualizacion() == null ||
+                destinos.getHoraCreacion() == null || destinos.getHoraActualizacion() == null || destinos.getAtracionesPrincipales() == null ||
+                destinos.getImagenes() == null || destinos.getTipoTurismo() == null || destinos.getEpocasVisitar() == null) {
+            return ResponseEntity.badRequest().build();
         }
-        Destinos destinosGuardado = destinosServicio.guardarDestino(destinos);
+
+        try {
+            Destinos destinosGuardado = destinosServicio.guardarDestino(destinos);
             return ResponseEntity.status(HttpStatus.CREATED).body(destinosGuardado);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
     //recuperar todos los destinos
     @GetMapping("/destinos/obtenerTodosLosDestinos")
     public ResponseEntity<List<Destinos>>obtenerTodosLosDestinos(){
@@ -40,7 +49,7 @@ public class DestinosControlador {
                 return ResponseEntity.ok(destinos);
     }
     //actulizar destino
-    @PutMapping("destinos/{id}")
+    @PutMapping("/destinos/{id}")
     public ResponseEntity<?> actualizarDestinos(@PathVariable("id") Long id, @RequestBody Destinos destinosActualizada) {
         try {
             // Verificar si el ID proporcionado en la ruta coincide con el ID del destino actualizada

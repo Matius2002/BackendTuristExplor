@@ -1,34 +1,20 @@
 package org.example.proyecturitsexplor.Entidades;
 import jakarta.persistence.*;
 import java.util.Date;
-
+import java.util.HashSet;
+import java.util.Set;
 @Entity
 @Table(name = "destino")
 public class Destinos {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     @Column(name = "destinoName")
     private String destinoName;
-
     @Column(name = "descripcion")
     private String descripcion;
-
     @Column(name = "ubicacion")
     private String ubicacion;
-
-    @Column(name = "tipoTurismo")
-    private String tipoTurismo;
-
-    @Column(name = "atraccionesPrincipales")
-    private String atraccionesPrincipales;
-
-    @Column(name = "epocaVisitar")
-    private String epocaVisitar;
-
-    @Column(name = "imagenes")
-    private String imagenes;
 
     @Column(name = "fechaCreacion", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date fechaCreacion;
@@ -42,26 +28,58 @@ public class Destinos {
     @Column(name = "horaActualizacion")
     private String horaActualizacion;
 
+    // Relación con tipos de turismo
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "destino_tipos_turismo",
+            joinColumns = @JoinColumn(name = "destino_id"),
+            inverseJoinColumns = @JoinColumn(name = "tipo_turismo_id")
+    )
+    private Set<TipoTurismo> tipoTurismo = new HashSet<>();
+
+    // Relación con atracciones principales
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "destino_atraciones_principales",
+            joinColumns = @JoinColumn(name = "destino_id"),
+            inverseJoinColumns = @JoinColumn(name = "atracion_principal_id")
+    )
+    private Set<AtracionPrincipal> atracionesPrincipales = new HashSet<>();
+
+    // Relación con épocas para visitar
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "destino_epocas_visitar",
+            joinColumns = @JoinColumn(name = "destino_id"),
+            inverseJoinColumns = @JoinColumn(name = "epoca_visitar_id")
+    )
+    private Set<EpocaVisitar> epocasVisitar = new HashSet<>();
+
+    // Relación con imágenes
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "destino_imagenes",
+            joinColumns = @JoinColumn(name = "destino_id"),
+            inverseJoinColumns = @JoinColumn(name = "imagen_id")
+    )
+    private Set<Images> imagenes = new HashSet<>();
+
+
+
     // Constructores
     public Destinos() {}
 
-    public Destinos(String destinoName, String descripcion, String ubicacion, String tipoTurismo,
-                    String atraccionesPrincipales, String epocaVisitar, String imagenes,
+    public Destinos(String destinoName, String descripcion, String ubicacion,
                     Date fechaCreacion, String horaCreacion, Date fechaActualizacion,
                     String horaActualizacion) {
         this.destinoName = destinoName;
         this.descripcion = descripcion;
         this.ubicacion = ubicacion;
-        this.tipoTurismo = tipoTurismo;
-        this.atraccionesPrincipales = atraccionesPrincipales;
-        this.epocaVisitar = epocaVisitar;
-        this.imagenes = imagenes;
         this.fechaCreacion = fechaCreacion;
         this.horaCreacion = horaCreacion;
         this.fechaActualizacion = fechaActualizacion;
         this.horaActualizacion = horaActualizacion;
     }
-
     // Getters y Setters
     public Long getId() {
         return id;
@@ -95,35 +113,35 @@ public class Destinos {
         this.ubicacion = ubicacion;
     }
 
-    public String getTipoTurismo() {
+    public Set<TipoTurismo> getTipoTurismo() {
         return tipoTurismo;
     }
 
-    public void setTipoTurismo(String tipoTurismo) {
+    public void setTipoTurismo(Set<TipoTurismo> tipoTurismo) {
         this.tipoTurismo = tipoTurismo;
     }
 
-    public String getAtraccionesPrincipales() {
-        return atraccionesPrincipales;
+    public Set<AtracionPrincipal> getAtracionesPrincipales() {
+        return atracionesPrincipales;
     }
 
-    public void setAtraccionesPrincipales(String atraccionesPrincipales) {
-        this.atraccionesPrincipales = atraccionesPrincipales;
+    public void setAtracionesPrincipales(Set<AtracionPrincipal> atracionesPrincipales) {
+        this.atracionesPrincipales = atracionesPrincipales;
     }
 
-    public String getEpocaVisitar() {
-        return epocaVisitar;
+    public Set<EpocaVisitar> getEpocasVisitar() {
+        return epocasVisitar;
     }
 
-    public void setEpocaVisitar(String epocaVisitar) {
-        this.epocaVisitar = epocaVisitar;
+    public void setEpocasVisitar(Set<EpocaVisitar> epocasVisitar) {
+        this.epocasVisitar = epocasVisitar;
     }
 
-    public String getImagenes() {
+    public Set<Images> getImagenes() {
         return imagenes;
     }
 
-    public void setImagenes(String imagenes) {
+    public void setImagenes(Set<Images> imagenes) {
         this.imagenes = imagenes;
     }
 
@@ -168,8 +186,8 @@ public class Destinos {
                 ", descripcion='" + descripcion + '\'' +
                 ", ubicacion='" + ubicacion + '\'' +
                 ", tipoTurismo='" + tipoTurismo + '\'' +
-                ", atraccionesPrincipales='" + atraccionesPrincipales + '\'' +
-                ", epocaVisitar='" + epocaVisitar + '\'' +
+                ", atracionesPrincipales='" + atracionesPrincipales + '\'' +
+                ", epocasVisitar='" + epocasVisitar + '\'' +
                 ", imagenes='" + imagenes + '\'' +
                 ", fechaCreacion=" + fechaCreacion +
                 ", horaCreacion=" + horaCreacion +

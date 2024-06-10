@@ -1,2 +1,4 @@
-package org.example.proyecturitsexplor.Controlador;public class AuditoriaControlador {
+package org.example.proyecturitsexplor.Controlador;
+
+public class AuditoriaControlador {
 }

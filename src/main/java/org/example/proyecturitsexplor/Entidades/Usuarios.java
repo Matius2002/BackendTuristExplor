@@ -1,17 +1,18 @@
 package org.example.proyecturitsexplor.Entidades;
 import jakarta.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "user")
-public class User {
+@Table(name = "users")
+public class Usuarios {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "nombre_usuario", nullable = false)
+    @Column(name = "nombre_usuario")
     private String nombreUsuario;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -21,7 +22,6 @@ public class User {
     private String password;
 
     @Column(name = "fecha_registro", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
     private Date fechaRegistro;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -33,13 +33,14 @@ public class User {
     private Set<Rol> roles;
 
     // Constructores
-    public User() {}
+    public Usuarios() {}
 
-    public User(String nombreUsuario, String email, String password, Date fechaRegistro, String rol) {
+    public Usuarios(String nombreUsuario, String email, String password, Date fechaRegistro) {
         this.nombreUsuario = nombreUsuario;
         this.email = email;
         this.password = password;
         this.fechaRegistro = fechaRegistro;
+        this.roles = new HashSet<>();  // Inicialice permission para evitar NullPointerException
     }
 
     // Getters y Setters
@@ -84,7 +85,7 @@ public class User {
     }
 
     public Set<Rol> getRoles() {
-        return roles;
+        return roles != null ? roles : new HashSet<>();
     }
 
     public void setRoles(Set<Rol> roles) {
@@ -100,7 +101,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", fechaRegistro=" + fechaRegistro +
-                ", rol='" + roles + '\'' +
+                //", rol='" + roles + '\'' +
                 '}';
     }
 }

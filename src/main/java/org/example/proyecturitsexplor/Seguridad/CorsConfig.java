@@ -1,5 +1,4 @@
 package org.example.proyecturitsexplor.Seguridad;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -8,8 +7,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
-public class CorsConfig
-{
+public class CorsConfig {
 
     @Bean
     public CorsFilter corsFilter() {
@@ -17,12 +15,13 @@ public class CorsConfig
         CorsConfiguration config = new CorsConfiguration();
 
         // Permitir solicitudes desde la interfaz Angular (actualice con la URL de su interfaz)
-        config.addAllowedOrigin("http://10.100.207.13");
+        //config.addAllowedOrigin("http://10.100.207.13");
         config.addAllowedOrigin("http://localhost");
         config.addAllowedOrigin("http://localhost:80");
         config.addAllowedOrigin("http://localhost:4200");
         config.addAllowedOrigin("http://localhost:8082");
         config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("http://localhost:52177");
 
         // Permitir métodos HTTP comunes (GET, POST, PUT, DELETE, etc.)
         config.addAllowedMethod("*");
