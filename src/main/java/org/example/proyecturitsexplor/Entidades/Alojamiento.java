@@ -10,39 +10,27 @@ public class Alojamiento {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     @Column(name = "nombre", nullable = false)
     private String nombre;
-
     @Column(name = "descripcion", nullable = false)
     private String descripcion;
-
     @ManyToOne
     @JoinColumn(name = "tipo_id")
     private TipoAlojamiento tipoAlojamiento;
-
     @Column(name = "direccion")
     private String direccion;
-
     @Column(name = "celular")
     private String celular;
-
     @Column(name = "email")
     private String email;
-
     @Column(name = "web_url")
     private String webUrl;
-
     @Column(name = "precio_general")
     private Double precioGeneral;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "fecha_creacion")
-    @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;
-
-    @Column(name = "fecha_actualizacion")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaActualizacion;
 
     @ManyToMany
     @JoinTable(
@@ -52,20 +40,27 @@ public class Alojamiento {
     )
     private Set<Destinos> destinos = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "alojamiento_imagenes",
+            joinColumns = @JoinColumn(name = "alojamiento_id"),
+            inverseJoinColumns = @JoinColumn(name = "imagen_id")
+    )
+    private Set<Images> imagenes = new HashSet<>();
+
     // Constructores (Vacio y Cargado)
     public Alojamiento() {
     }
-    public Alojamiento(String nombre, String descripcion, TipoAlojamiento tipoAlojamiento, String direccion, String celular, String email, String webUrl, Double precioGeneral, Date fechaCreacion, Date fechaActualizacion) {
+    public Alojamiento(String nombre, String descripcion, String direccion, String celular, String email, String webUrl, Double precioGeneral, Date fechaCreacion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.tipoAlojamiento = tipoAlojamiento;
+        //this.tipoAlojamiento = tipoAlojamiento;
         this.direccion = direccion;
         this.celular = celular;
         this.email = email;
         this.webUrl = webUrl;
         this.precioGeneral = precioGeneral;
         this.fechaCreacion = fechaCreacion;
-        this.fechaActualizacion = fechaActualizacion;
     }
 
     // Getters y setters
@@ -149,13 +144,6 @@ public class Alojamiento {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public Date getFechaActualizacion() {
-        return fechaActualizacion;
-    }
-
-    public void setFechaActualizacion(Date fechaActualizacion) {
-        this.fechaActualizacion = fechaActualizacion;
-    }
 
     public Set<Destinos> getDestinos() {
         return destinos;
@@ -163,6 +151,14 @@ public class Alojamiento {
 
     public void setDestinos(Set<Destinos> destinos) {
         this.destinos = destinos;
+    }
+
+    public Set<Images> getImagenes() {
+        return imagenes;
+    }
+
+    public void setImagenes(Set<Images> imagenes) {
+        this.imagenes = imagenes;
     }
 
     // Método toString()
@@ -180,7 +176,7 @@ public class Alojamiento {
                 ", webUrl='" + webUrl + '\'' +
                 ", precioGeneral=" + precioGeneral +
                 ", fechaCreacion=" + fechaCreacion +
-                ", fechaActualizacion=" + fechaActualizacion +
+                ", imagenes=" + imagenes +
                 '}';
     }
 }

@@ -1,9 +1,6 @@
 package org.example.proyecturitsexplor.Entidades;
 import jakarta.persistence.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
 @Table(name = "tipoTurismo")
 public class TipoTurismo {
@@ -22,8 +19,8 @@ public class TipoTurismo {
     private String popularidad;
 
     // Relación con Noticia
-    @OneToMany(mappedBy = "tipoTurismo", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Noticia> noticias = new HashSet<>();
+//    @OneToMany(mappedBy = "tipoTurismo", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<Noticia> noticias = new HashSet<>();
 
     // Constructores (Vacio y Cargado)
     public TipoTurismo() {
@@ -67,13 +64,13 @@ public class TipoTurismo {
     public void setPopularidad(String popularidad) {
         this.popularidad = popularidad;
     }
-    public Set<Noticia> getNoticias() {
-        return noticias;
-    }
-
-    public void setNoticias(Set<Noticia> noticias) {
-        this.noticias = noticias;
-    }
+//    public Set<Noticia> getNoticias() {
+//        return noticias;
+//    }
+//
+//    public void setNoticias(Set<Noticia> noticias) {
+//        this.noticias = noticias;
+//    }
 
     // Método toString()
     @Override
@@ -83,7 +80,8 @@ public class TipoTurismo {
                 ", nombre='" + nombre + '\'' +
                 ", descripcion='" + descripcion + '\'' +
                 ", popularidad=" + popularidad +
-                ", noticias=" + noticias +
+                //", noticias=" + noticias +
                 '}';
     }
 }
+//ayudame a realizar esta relación. Un evento puede tener muchos tipo de turismo.

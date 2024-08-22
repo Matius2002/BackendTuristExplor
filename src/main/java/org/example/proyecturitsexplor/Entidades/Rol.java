@@ -1,14 +1,12 @@
 package org.example.proyecturitsexplor.Entidades;
 import jakarta.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "rol")
 public class Rol {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "rol_name", nullable = false)
@@ -25,13 +23,13 @@ public class Rol {
     @Temporal(TemporalType.TIMESTAMP)
     private Date rolFechaModic;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "roles_permisos",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permiso_id")
     )
-    private Set<Permiso> permisos;
+    private List<Permiso> permisos=new ArrayList<>();
 
     // Constructores
     public Rol() {}
@@ -41,7 +39,7 @@ public class Rol {
         this.rolDescripc = rolDescripc;
         this.rolFechaCreac = rolFechaCreac;
         this.rolFechaModic = rolFechaModic;
-        this.permisos = new HashSet<>();  // Inicialice permission para evitar NullPointerException
+        // Inicialice permission para evitar NullPointerException
     }
 
     // Getters y Setters
@@ -85,6 +83,14 @@ public class Rol {
         this.rolFechaModic = rolFechaModic;
     }
 
+    public void setPermisos(List<Permiso> permisos) {
+        this.permisos = permisos;
+    }
+
+    public List<Permiso> getPermisos() {
+        return permisos;
+    }
+
     // Método toString()
     @Override
     public String toString() {
@@ -96,5 +102,4 @@ public class Rol {
                 ", rolFechaModic=" + rolFechaModic +
                 '}';
     }
-
 }

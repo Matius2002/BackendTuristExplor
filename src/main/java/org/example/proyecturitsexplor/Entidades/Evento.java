@@ -12,10 +12,6 @@ public class Evento {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "destino_id", nullable = false)
-    private Destinos destino;
-
     @Column(name = "nombre")
     private String nombre;
 
@@ -23,9 +19,11 @@ public class Evento {
     private String descripcion;
 
     @Column(name = "fecha_inicio")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date fechaInicio;
 
     @Column(name = "fecha_fin")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date fechaFin;
 
     @Column(name = "ubicacion")
@@ -33,6 +31,10 @@ public class Evento {
 
     @Column(name = "costo_entrada")
     private Double costoEntrada;
+
+    @ManyToOne
+        @JoinColumn(name = "tipoT_id")
+        private TipoTurismo tipoTurismo;
 
     @ManyToMany
     @JoinTable(
@@ -42,11 +44,20 @@ public class Evento {
     )
     private Set<Images> images = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "evento_destino",
+            joinColumns = @JoinColumn(name = "evento_id"),
+            inverseJoinColumns = @JoinColumn(name = "destino_id")
+    )
+    private Set<Destinos> destinos = new HashSet<>();
+
+
     // Constructores
     public Evento() {}
 
-    public Evento(Destinos destino, String nombre, String descripcion, Date fechaInicio, Date fechaFin, String ubicacion, Double costoEntrada, Date fechaCreacion, Date fechaActualizacion) {
-        this.destino = destino;
+    public Evento(String nombre, String descripcion, Date fechaInicio, Date fechaFin, String ubicacion,
+                  Double costoEntrada) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.fechaInicio = fechaInicio;
@@ -65,13 +76,6 @@ public class Evento {
         this.id = id;
     }
 
-    public Destinos getDestino() {
-        return destino;
-    }
-
-    public void setDestino(Destinos destino) {
-        this.destino = destino;
-    }
 
     public String getNombre() {
         return nombre;
@@ -121,20 +125,42 @@ public class Evento {
         this.costoEntrada = costoEntrada;
     }
 
-
+    // Getter for images
     public Set<Images> getImages() {
         return images;
     }
 
+    // Setter for images
     public void setImages(Set<Images> images) {
         this.images = images;
     }
+
+    // Getter for destinos
+    public Set<Destinos> getDestinos() {
+        return destinos;
+    }
+
+    // Setter for destinos
+    public void setDestinos(Set<Destinos> destinos) {
+        this.destinos = destinos;
+    }
+
+    // Getters y Setters para tipoTurismo
+
+    public TipoTurismo getTipoTurismo() {
+        return tipoTurismo;
+    }
+
+    public void setTipoTurismo(TipoTurismo tipoTurismo) {
+        this.tipoTurismo = tipoTurismo;
+    }
+
     // Método toString()
     @Override
     public String toString() {
         return "Evento{" +
                 "id=" + id +
-                ", destino=" + destino +
+                ", destinos=" + destinos +
                 ", nombre='" + nombre + '\'' +
                 ", descripcion='" + descripcion + '\'' +
                 ", fechaInicio=" + fechaInicio +
@@ -142,6 +168,7 @@ public class Evento {
                 ", ubicacion='" + ubicacion + '\'' +
                 ", costoEntrada=" + costoEntrada +
                 ", images=" + images +
+                ", tipoTurismo=" + tipoTurismo +
                 '}';
     }
 }

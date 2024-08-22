@@ -1,0 +1,27 @@
+
+spring:
+  application:
+    name: ProyecTuritsExplor
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/TuristExplor
+    username: postgres
+    password: 1234
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+  servlet:
+    multipart:
+      max-file-size: 2000MB
+      max-request-size: 2000MB
+
+security:
+  jwt:
+    expiration-in-minutes: 60

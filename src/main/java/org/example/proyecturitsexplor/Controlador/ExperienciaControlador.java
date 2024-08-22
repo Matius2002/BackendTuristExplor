@@ -20,13 +20,14 @@ public class ExperienciaControlador {
     //CRUD
     @PostMapping("/experiencias/guardarExperiencia")
     public ResponseEntity<Experiencia> guardarExperiencia(@RequestBody Experiencia experiencia) {
-        if (experiencia.getDestino()==null || experiencia.getUsuario()==null ||
-                experiencia.getCalificacion()==null || experiencia.getComentario()==null || experiencia.getFecha()==null){
-            return  ResponseEntity.badRequest().build();
+        if (experiencia.getDestino() == null || experiencia.getUsuario() == null ||
+                experiencia.getCalificacion() == null || experiencia.getComentario() == null || experiencia.getFecha() == null) {
+            return ResponseEntity.badRequest().build();
         }
         Experiencia experienciaGuardado = experienciaServicio.guardarExperiencia(experiencia);
         return ResponseEntity.status(HttpStatus.CREATED).body(experienciaGuardado);
     }
+
 
     //Recuperar todos las experiencia
     @GetMapping("/experiencias/obtenerTodosLosExperiencia")

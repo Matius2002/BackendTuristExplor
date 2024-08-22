@@ -19,14 +19,8 @@ public class Destinos {
     @Column(name = "fechaCreacion", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date fechaCreacion;
 
-    @Column(name = "horaCreacion")
-    private String horaCreacion;
-
     @Column(name = "fechaActualizacion" , columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date fechaActualizacion;
-
-    @Column(name = "horaActualizacion")
-    private String horaActualizacion;
 
     // Relación con tipos de turismo
     @ManyToMany(cascade = CascadeType.PERSIST)
@@ -64,7 +58,8 @@ public class Destinos {
     )
     private Set<Images> imagenes = new HashSet<>();
 
-
+    @ManyToMany(mappedBy = "destinos")
+    private Set<Evento> eventos = new HashSet<>();
 
     // Constructores
     public Destinos() {}
@@ -76,9 +71,8 @@ public class Destinos {
         this.descripcion = descripcion;
         this.ubicacion = ubicacion;
         this.fechaCreacion = fechaCreacion;
-        this.horaCreacion = horaCreacion;
         this.fechaActualizacion = fechaActualizacion;
-        this.horaActualizacion = horaActualizacion;
+
     }
     // Getters y Setters
     public Long getId() {
@@ -153,28 +147,12 @@ public class Destinos {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public String getHoraCreacion() {
-        return horaCreacion;
-    }
-
-    public void setHoraCreacion(String horaCreacion) {
-        this.horaCreacion = horaCreacion;
-    }
-
     public Date getFechaActualizacion() {
         return fechaActualizacion;
     }
 
     public void setFechaActualizacion(Date fechaActualizacion) {
         this.fechaActualizacion = fechaActualizacion;
-    }
-
-    public String getHoraActualizacion() {
-        return horaActualizacion;
-    }
-
-    public void setHoraActualizacion(String horaActualizacion) {
-        this.horaActualizacion = horaActualizacion;
     }
 
     // Método toString()
@@ -190,9 +168,7 @@ public class Destinos {
                 ", epocasVisitar='" + epocasVisitar + '\'' +
                 ", imagenes='" + imagenes + '\'' +
                 ", fechaCreacion=" + fechaCreacion +
-                ", horaCreacion=" + horaCreacion +
                 ", fechaActualizacion=" + fechaActualizacion +
-                ", horaActualizacion=" + horaActualizacion +
                 '}';
     }
 }

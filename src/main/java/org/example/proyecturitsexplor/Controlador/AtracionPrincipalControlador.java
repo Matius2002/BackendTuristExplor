@@ -1,4 +1,6 @@
-package org.example.proyecturitsexplor.Controlador;
+package org.example.proyecturitsexplor.Controlador; /*Paquete*/
+
+/*Importaciones*/
 import org.example.proyecturitsexplor.Entidades.AtracionPrincipal;
 import org.example.proyecturitsexplor.Repositorios.AtracionPrincipalRepositorio;
 import org.example.proyecturitsexplor.Servicios.AtracionPrincipalServicio;
@@ -9,10 +11,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+/*Anotaciones del controlador*/
 @Controller
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:8080")
 public class AtracionPrincipalControlador {
+    /*Inyección de dependencias*/
     @Autowired
     private AtracionPrincipalRepositorio atracionPrincipalRepositorio;
     @Autowired

@@ -1,0 +1,18 @@
+spring.application.name=ProyecTuritsExplor
+
+# Configuración de la base de datos local
+spring.datasource.url=jdbc:postgresql://localhost:5432/TuristExplor
+spring.datasource.username=postgres
+
+# Configuración de Hibernate para PostgreSQL
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+
+# Configuración para el tamano máximo de archivos
+spring.servlet.multipart.max-file-size=2000MB
+spring.servlet.multipart.max-request-size=2000MB
+
+# Configuración JWT
+security.jwt.expiration-in-minutes=60
+

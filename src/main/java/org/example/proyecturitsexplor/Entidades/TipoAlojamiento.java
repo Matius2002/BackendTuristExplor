@@ -19,13 +19,13 @@ public class TipoAlojamiento {
     private String servicios;
 
     @Column(name = "precio_promedio")
-    private double precioPromedio = Double.NaN;
+    private String precioPromedio;
 
     // Constructores (Vacio y Cargado)
     public TipoAlojamiento() {
     }
 
-    public TipoAlojamiento(String nombre, String descripcion, String servicios, double precioPromedio) {
+    public TipoAlojamiento(String nombre, String descripcion, String servicios, String precioPromedio) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.servicios = servicios;
@@ -65,11 +65,11 @@ public class TipoAlojamiento {
         this.servicios = servicios;
     }
 
-    public double getPrecioPromedio() {
+    public String getPrecioPromedio() {
         return precioPromedio;
     }
 
-    public void setPrecioPromedio(double precioPromedio) {
+    public void setPrecioPromedio(String precioPromedio) {
         this.precioPromedio = precioPromedio;
     }
 

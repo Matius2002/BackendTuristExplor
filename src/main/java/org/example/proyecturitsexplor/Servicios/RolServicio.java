@@ -1,6 +1,5 @@
 package org.example.proyecturitsexplor.Servicios;
 import org.example.proyecturitsexplor.Entidades.Rol;
-import org.example.proyecturitsexplor.Entidades.Usuarios;
 import org.example.proyecturitsexplor.Excepciones.RolNotFoundException;
 import org.example.proyecturitsexplor.Repositorios.RolRepositorio;
 import org.example.proyecturitsexplor.Repositorios.UserRepositorio;
@@ -30,7 +29,7 @@ public class RolServicio {
         return rolRepositorio.findById(id).orElseThrow(()-> new RolNotFoundException(id));
     }
     //actulizar Rol
-    public Rol actulizarRol(Rol rol) {
+    public Rol actualizarRol(Rol rol) {
         return rolRepositorio.save(rol);
     }
     //Eliminar Rol
@@ -43,8 +42,3 @@ public class RolServicio {
     }
 }
 
-//public boolean usuarioTieneRolAdmin(String email) {
-//        Usuarios usuario = userRepositorio.findByEmail(email);
-//        return usuario != null && usuario.getRoles().stream()
-//                .anyMatch(rol -> rol.getRolName().equals("ADMIN"));
-//    }

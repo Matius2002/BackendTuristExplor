@@ -1,28 +1,48 @@
 package org.example.proyecturitsexplor.Servicios;
+
+import org.example.proyecturitsexplor.Entidades.Rol;
 import org.example.proyecturitsexplor.Entidades.Usuarios;
 import org.example.proyecturitsexplor.Excepciones.UserNotFoundException;
+import org.example.proyecturitsexplor.Repositorios.RolRepositorio;
 import org.example.proyecturitsexplor.Repositorios.UserRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServicio {
     @Autowired
     private UserRepositorio userRepositorio;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RolRepositorio rolRep;
 
     public UserServicio(UserRepositorio userRepositorio) {
         this.userRepositorio = userRepositorio;
     }
-    //CRUD
-    //Obtener todos los Usuarios
+
+    // CRUD
+    // Obtener todos los Usuarios
     public List<Usuarios> obtenerTodosLosUsuarios () {
         return userRepositorio.findAll();
     }
     //guardar Usuarios
     public Usuarios guardarUsuarios(Usuarios usuarios) {
+        List<Rol> rolesUsuario=new ArrayList<>();
+        usuarios.getRoles().forEach(r->{
+            System.out.println(r.getId());
+            Rol rolBD=this.rolRep.findById(r.getId()).get();
+            rolesUsuario.add(rolBD);
+        });
+        usuarios.setPassword(this.passwordEncoder.encode(usuarios.getPassword()));
+        //usuarios.setRoles(rolesUsuario);
         return userRepositorio.save(usuarios);
     }
     //Obtener la Usuarios por id
@@ -46,38 +66,26 @@ public class UserServicio {
         return userRepositorio.existsByEmail(email);
     }
 
-    //Login de inicio de session
-    public ResponseEntity<?> loginUsuario(Usuarios usuarios) {
-        if (verificarExistentePorEmail(usuarios.getEmail())) {
-            Usuarios contra = userRepositorio.findByEmail(usuarios.getEmail());
-            String contrasenaEncriptada = (usuarios.getPassword());
-            if (contrasenaEncriptada.equals(contra.getPassword())) {
-                System.out.println("TRUE");
-                return new ResponseEntity<>(true, HttpStatus.OK);
-            } else {
-                System.out.println("NO COINCIDEN");
-                return new ResponseEntity<>(false, HttpStatus.OK);
-            }
-        } else {
-            System.out.println("NO SE ENCUENTRA");
-            return new ResponseEntity<>(false, HttpStatus.OK);
-        }
-    }
+
 
     public Usuarios obtenerUsuariosPorEmail(String email) {
-        Usuarios usuario = userRepositorio.findByEmail(email);
-        if (usuario == null) {
+        Usuarios usuario=null;
+        Optional<Usuarios> usuarioOptional = userRepositorio.findByEmail(email);
+        if (usuarioOptional.isEmpty()) {
             usuario = new Usuarios();
         }
+        usuario=usuarioOptional.get();
         return usuario;
     }
     public Usuarios obtenerPorEmail(String email) {
-        return userRepositorio.findByEmail(email);
-    }
 
+        Usuarios usuario=null;
+        Optional<Usuarios> usuarioOptional = userRepositorio.findByEmail(email);
+        if (usuarioOptional.isEmpty()) {
+            usuario = new Usuarios();
+        }
+        usuario=usuarioOptional.get();
+        return usuario;
+    }
 }
 
-//    public boolean authenticateUser(String nombreUsuario, String password) {
-//        Usuarios usuarios = userRepositorio.findByNombreUsuario(nombreUsuario);
-//        return usuarios != null && passwordEncoder.matches(password, usuarios.getPassword());
-//    }

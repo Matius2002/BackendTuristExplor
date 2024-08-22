@@ -22,9 +22,11 @@ public class DestinosControlador {
     @PostMapping("/destinos/guardarDestinos")
     public ResponseEntity<Destinos> guardarDestinos(@RequestBody Destinos destinos) {
         if (destinos.getDestinoName() == null || destinos.getDescripcion() == null ||
-                destinos.getUbicacion() == null || destinos.getFechaCreacion() == null || destinos.getFechaActualizacion() == null ||
-                destinos.getHoraCreacion() == null || destinos.getHoraActualizacion() == null || destinos.getAtracionesPrincipales() == null ||
-                destinos.getImagenes() == null || destinos.getTipoTurismo() == null || destinos.getEpocasVisitar() == null) {
+                destinos.getUbicacion() == null || destinos.getFechaCreacion() == null ||
+                destinos.getFechaActualizacion() == null ||
+                destinos.getAtracionesPrincipales() == null ||
+                destinos.getImagenes() == null || destinos.getTipoTurismo() == null ||
+                destinos.getEpocasVisitar() == null) {
             return ResponseEntity.badRequest().build();
         }
 

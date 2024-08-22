@@ -23,7 +23,7 @@ public class Experiencia {
     @Column(name = "calificacion", nullable = false)
     private String calificacion;
 
-    @Column(name = "comentario", length = 500)
+    @Column(name = "comentario")
     private String comentario;
 
     @Column(name = "fecha", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")

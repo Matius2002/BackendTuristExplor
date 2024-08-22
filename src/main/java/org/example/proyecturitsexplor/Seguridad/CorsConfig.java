@@ -15,7 +15,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // Permitir solicitudes desde la interfaz Angular (actualice con la URL de su interfaz)
-        //config.addAllowedOrigin("http://10.100.207.13");
+        //config.addAllowedOrigin("http://10.100.207.13");  Modificar esta ruta.
         config.addAllowedOrigin("http://localhost");
         config.addAllowedOrigin("http://localhost:80");
         config.addAllowedOrigin("http://localhost:4200");

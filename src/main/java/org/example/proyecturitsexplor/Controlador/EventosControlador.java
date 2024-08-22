@@ -5,10 +5,12 @@ import org.example.proyecturitsexplor.Servicios.EventosServicio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Controller
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:8080")
@@ -18,17 +20,27 @@ public class EventosControlador {
     @Autowired
     private EventosServicio eventosServicio;
 
+    private static final Logger logger = LoggerFactory.getLogger(EventosControlador.class);
+
+    //@PreAuthorize("hasRole('')")
     //CRUD
     @PostMapping("/eventos/guardarEventos")
     public ResponseEntity<Evento> guardarEventos(@RequestBody Evento evento) {
-        if (evento.getDestino()==null || evento.getNombre()==null || evento.getDescripcion()==null || evento.getFechaInicio()==null
-                || evento.getFechaFin()==null || evento.getUbicacion()==null ||
-                evento.getCostoEntrada()==null || evento.getImages()==null){
-            return  ResponseEntity.badRequest().build();
+        logger.info("Datos recibidos para guardar evento: {}", evento.toString());
+
+        // Verifica que la colección de destinos no esté vacía
+        if (evento.getDestinos()==null || evento.getNombre() == null || evento.getDescripcion() == null ||
+                evento.getFechaInicio() == null || evento.getFechaFin() == null || evento.getUbicacion() == null ||
+                evento.getCostoEntrada() == null || evento.getImages() == null || evento.getTipoTurismo()==null) {
+
+            logger.warn("Datos incompletos en la solicitud recibida");
+            return ResponseEntity.badRequest().build();
         }
+
         Evento eventoGuardado = eventosServicio.guardarEvento(evento);
         return ResponseEntity.status(HttpStatus.CREATED).body(eventoGuardado);
     }
+
 
     //Recuperar todos los evento
     @GetMapping("/eventos/obtenerTodosLosEvento")

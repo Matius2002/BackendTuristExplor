@@ -1,5 +1,4 @@
 package org.example.proyecturitsexplor.Servicios;
-
 import org.example.proyecturitsexplor.Entidades.Images;
 import org.example.proyecturitsexplor.Excepciones.ImagesNotFoundException;
 import org.example.proyecturitsexplor.Repositorios.ImagesRepositorio;
@@ -9,9 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-
 @Service
 public class ImagesServicio {
     @Autowired
@@ -21,13 +18,9 @@ public class ImagesServicio {
         this.imagesRepositorio = imagesRepositorio;
     }
 
-    //CRUD
-    public Images guardarImagen(MultipartFile archivo, String nombre) throws IOException {
-        // Definir el directorio donde se guardarán las imágenes
-        String directorioImagenes = "C:\\ImagenesTurismo"; // Ruta real donde se guardarán las imágenes
-
+    // CRUD
+    public Images guardarImagen(MultipartFile archivo, String nombre, Path directorioPath) throws IOException {
         // Verificar si el directorio existe, si no, crearlo
-        Path directorioPath = Paths.get(directorioImagenes);
         if (!Files.exists(directorioPath)) {
             Files.createDirectories(directorioPath);
         }
@@ -53,36 +46,39 @@ public class ImagesServicio {
         // Crear una nueva instancia de Images y establecer sus atributos
         Images imagen = new Images();
         imagen.setNombre(nombre + extension);
-        imagen.setRuta(rutaArchivo.toString());
+        imagen.setRuta("/imagenes/" + nombre + extension);  // Ajuste aquí
         imagen.setActiva(true);
 
         // Guardar la entidad Images en la base de datos
         return imagesRepositorio.save(imagen);
     }
 
-
-    //Obtener todos los Images turisticos
-    public List<Images> obtenerTodosLosImages () {
+    // Obtener todos los Images turisticos
+    public List<Images> obtenerTodosLosImages() {
         return imagesRepositorio.findAll();
     }
-    //guardar Image turistico
+
+    // Guardar Image turistico
     public Images guardarImages(Images Images) {
         return imagesRepositorio.save(Images);
     }
 
-    //Obtener Images por id
+    // Obtener Images por id
     public Images obtenerImagesPorId(Long id) {
-        return imagesRepositorio.findById(id).orElseThrow(()-> new ImagesNotFoundException(id));
+        return imagesRepositorio.findById(id).orElseThrow(() -> new ImagesNotFoundException(id));
     }
-    //actulizar Image turistico
+
+    // Actualizar Image turistico
     public Images actulizarImages(Images Images) {
         return imagesRepositorio.save(Images);
     }
-    //Eliminar Image
+
+    // Eliminar Image
     public void eliminarImages(Long id) {
         imagesRepositorio.deleteById(id);
     }
-    //Verificar si existe en la base. por nombre
+
+    // Verificar si existe en la base por nombre
     public boolean verificarImageExistente(String Nombre) {
         return imagesRepositorio.existsByNombre(Nombre);
     }

@@ -1,15 +1,20 @@
 package org.example.proyecturitsexplor.Entidades;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.*;
 
 @Entity
 @Table(name = "users")
-public class Usuarios {
+public class Usuarios implements UserDetails {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "nombre_usuario")
@@ -21,26 +26,28 @@ public class Usuarios {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @CreationTimestamp
     @Column(name = "fecha_registro", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date fechaRegistro;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "usuarios_roles",
             joinColumns = @JoinColumn(name = "usuario_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Rol> roles;
+    private List<Rol> roles=new ArrayList<>();
 
     // Constructores
     public Usuarios() {}
 
-    public Usuarios(String nombreUsuario, String email, String password, Date fechaRegistro) {
+    public Usuarios(String nombreUsuario, String email, String password) {
         this.nombreUsuario = nombreUsuario;
         this.email = email;
         this.password = password;
-        this.fechaRegistro = fechaRegistro;
-        this.roles = new HashSet<>();  // Inicialice permission para evitar NullPointerException
+
     }
 
     // Getters y Setters
@@ -68,8 +75,43 @@ public class Usuarios {
         this.email = email;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> authorities=new ArrayList<>();
+        this.roles.forEach(role->{
+            authorities.add(new SimpleGrantedAuthority("ROLE_"+role.getRolName()));
+            role.getPermisos().forEach(permiso->authorities.add(new SimpleGrantedAuthority(permiso.getName())));
+        });
+        return authorities;
+    }
+
     public String getPassword() {
-        return password;
+        return this.password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
     public void setPassword(String password) {
@@ -84,11 +126,11 @@ public class Usuarios {
         this.fechaRegistro = fechaRegistro;
     }
 
-    public Set<Rol> getRoles() {
-        return roles != null ? roles : new HashSet<>();
+    public List<Rol> getRoles() {
+        return roles;
     }
 
-    public void setRoles(Set<Rol> roles) {
+    public void setRoles(List<Rol> roles) {
         this.roles = roles;
     }
 

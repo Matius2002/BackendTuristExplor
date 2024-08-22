@@ -32,104 +32,69 @@ public class RolControlador {
         this.auditoriaService = auditoriaServicio;
     }
 
-    // Verificar si el usuario tiene el rol requerido
-    private boolean tieneRol(String email, String rolName) {
-        return userServicio.obtenerUsuariosPorEmail(email).getRoles()
-                .stream().anyMatch(rol -> rol.getRolName().equals(rolName));
-    }
-    // endpoint verifica si un usuario tiene el rol de 'administrador'
-    @GetMapping("/check-admin-role/{email}")
-    public String checkAdminRole(@PathVariable String email) {
-        if (tieneRol(email, "admin")) {
-            return "El usuario tiene el rol de 'administrador'.";
-        } else {
-            return "El usuario no tiene el rol de 'administrador'.";
-        }
-    }
-    //GUARDAR ROL
+    // Guardar rol
     @PostMapping("/roles/guardarRoles")
-    public ResponseEntity<Rol> guardarRol(@RequestHeader("email") String email, @RequestBody Rol rol) {
-        if (!tieneRol(email, "ADMIN")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
+    public ResponseEntity<Rol> guardarRol(@RequestBody Rol rol) {
         if (rol.getRolName() == null || rol.getRolDescripc() == null ||
-                rol.getRolFechaCreac() == null || rol.getRolFechaModic() == null) {
+        rol.getRolFechaCreac()==null || rol.getRolFechaModic()==null) {
             return ResponseEntity.badRequest().build();
         }
-
         Rol rolGuardado = rolServicio.guardarRol(rol);
-        auditoriaService.registrarAccion(email, "Guardar Rol", "Se ha guardado el rol: " + rol.getRolName());
         return ResponseEntity.status(HttpStatus.CREATED).body(rolGuardado);
     }
 
+    // Recuperar todos los roles
     @GetMapping("/roles/obtenerTodosLasRoles")
-    public ResponseEntity<List<Rol>> obtenerTodosLasRoles(@RequestHeader("email") String email) {
-        if (!tieneRol(email, "ADMIN")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
+    public ResponseEntity<List<Rol>> obtenerTodosLosRoles() {
         List<Rol> roles = rolServicio.obtenerTodosLosRoles();
         return ResponseEntity.ok(roles);
     }
 
+    // Recuperar rol por ID
     @GetMapping("/roles/recuperarPorId/{id}")
-    public ResponseEntity<Rol> rolPorId(@RequestHeader("email") String email, @PathVariable Long id) {
-        if (!tieneRol(email, "ADMIN")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
+    public ResponseEntity<Rol> obtenerRolPorId(@PathVariable Long id) {
         Rol rol = rolServicio.obtenerRolPorId(id);
+        if (rol == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(rol);
     }
 
+    // Actualizar rol
     @PutMapping("/roles/{id}")
-    public ResponseEntity<?> actualizarRol(@RequestHeader("email") String email, @PathVariable("id") Long id, @RequestBody Rol rolActualizada) {
-        if (!tieneRol(email, "ADMIN")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
+    public ResponseEntity<?> actualizarRol(@PathVariable("id") Long id, @RequestBody Rol rolActualizado) {
         try {
-            if (!id.equals(rolActualizada.getId())) {
-                throw new IllegalArgumentException("El ID del rol principal del cuerpo no coincide con el ID proporcionado en la ruta.");
+            if (!id.equals(rolActualizado.getId())) {
+                throw new IllegalArgumentException("El ID del rol del cuerpo no coincide con el ID proporcionado en la ruta.");
             }
-
             Rol rolActual = rolServicio.obtenerRolPorId(id);
             if (rolActual == null) {
-                return new ResponseEntity<>("No se encontró ningun Rol principal con el ID proporcionado.", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>("No se encontró ningún rol con el ID proporcionado.", HttpStatus.NOT_FOUND);
             }
-
-            Rol rolGuardada = rolServicio.actulizarRol(rolActualizada);
-            return new ResponseEntity<>(rolGuardada, HttpStatus.OK);
+            Rol rolActualizadoGuardado = rolServicio.actualizarRol(rolActualizado);
+            return new ResponseEntity<>(rolActualizadoGuardado, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
+    // Eliminar rol
     @DeleteMapping("/roles/{id}")
-    public ResponseEntity<String> eliminarRolPorId(@RequestHeader("email") String email, @PathVariable Long id) {
-        if (!tieneRol(email, "ADMIN")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
+    public ResponseEntity<String> eliminarRolPorId(@PathVariable Long id) {
         rolServicio.eliminarRol(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Rol Principal con ID " + id + " eliminada correctamente.");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Rol con ID " + id + " eliminado correctamente.");
     }
 
+    // Verificar si un rol existe por nombre
     @GetMapping("/roles/existe/{nombre}")
-    public ResponseEntity<?> verificarAtracionPrincipalExistente(@RequestHeader("email") String email, @PathVariable String nombre) {
-        if (!tieneRol(email, "ADMIN")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
+    public ResponseEntity<?> verificarRolExistente(@PathVariable String nombre) {
         try {
             boolean existe = rolServicio.verificarRolExistente(nombre);
             return ResponseEntity.ok(existe);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al verificar si el Rol  existe por Nombre: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al verificar si el rol existe por nombre: " + e.getMessage());
         }
     }
-
 }
 
 
