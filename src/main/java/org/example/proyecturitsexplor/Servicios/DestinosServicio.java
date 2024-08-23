@@ -1,36 +1,41 @@
-package org.example.proyecturitsexplor.Servicios;
+/*Objetivo:  proporciona operaciones CRUD para la entidad Destinos. A través de este servicio, los destinos turísticos pueden ser creados, 
+leídos, actualizados y eliminados en la base de datos. Además, este servicio gestiona relaciones complejas entre Destinos y otras entidades 
+como TipoTurismo, AtracionPrincipal, EpocaVisitar, e Images, asegurando que todos los elementos relacionados existan antes de guardar o 
+actualizar un destino.*/
+package org.example.proyecturitsexplor.Servicios; /*Paquete*/
+
+/*Importaciones*/
 import org.example.proyecturitsexplor.Entidades.*;
 import org.example.proyecturitsexplor.Excepciones.DestinosNotFoundException;
 import org.example.proyecturitsexplor.Repositorios.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/*Servicio y clase*/
 @Service
 public class DestinosServicio {
+
+    /*Dependencias y variables*/
     @Autowired
     private DestinosRepositorio destinosRepositorio;
-
     @Autowired
-        private TipoTurismoRepositorio tipoTurismoRepositorio;
+    private TipoTurismoRepositorio tipoTurismoRepositorio;
+    @Autowired
+    private AtracionPrincipalRepositorio atracionPrincipalRepositorio;
+    @Autowired
+    private EpocaVisitarRepositorio epocaVisitarRepositorio;
+    @Autowired
+    private ImagesRepositorio imagesRepositorio;
 
-        @Autowired
-        private AtracionPrincipalRepositorio atracionPrincipalRepositorio;
-
-        @Autowired
-        private EpocaVisitarRepositorio epocaVisitarRepositorio;
-
-        @Autowired
-        private ImagesRepositorio imagesRepositorio;
-
+    /*Métodos*/
     public DestinosServicio(DestinosRepositorio destinosRepositorio) {
         this.destinosRepositorio = destinosRepositorio;
     }
-    //CRUD
 
+    //CRUD
     //Obtener todos los destinos turisticos
     public List<Destinos> obtenerTodosLosDestinos () {
         return destinosRepositorio.findAll();

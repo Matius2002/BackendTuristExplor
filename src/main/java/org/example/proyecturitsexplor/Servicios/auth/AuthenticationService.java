@@ -1,4 +1,8 @@
-package org.example.proyecturitsexplor.Servicios.auth;
+/*Objetivo: Este código define un servicio de autenticación en un proyecto Spring Boot. El servicio maneja la autenticación de usuarios 
+y la gestión de tokens JWT (JSON Web Token).*/
+package org.example.proyecturitsexplor.Servicios.auth; /*Paquete*/
+
+/*Importaciones*/
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.proyecturitsexplor.DTO.LoginRequestDTO;
 import org.example.proyecturitsexplor.DTO.LoginResponseDTO;
@@ -43,6 +47,7 @@ public class AuthenticationService {
         Usuarios usuario=this.userRep.findByEmail(credenciales.getEmail()).get();
         return new LoginResponseDTO(this.jwtService.generarToken(usuario, generarClaims(usuario)));
     }
+
     private Map<String, Object> generarClaims(Usuarios usuario) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", usuario.getId());
@@ -53,6 +58,7 @@ public class AuthenticationService {
         claims.put("correo", usuario.getEmail());
         return claims;
     }
+    
     public UserResponseDTO findLoggedUser(){
         String email=(String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Usuarios usuario=this.userRep.findByEmail(email).orElseThrow(()->new UserNotFoundException(email));
@@ -67,6 +73,7 @@ public class AuthenticationService {
             return false;
         }
     }
+
     public String renewToken(String token) {
         // Lógica para renovar el token
         String renewedToken = null;
@@ -82,6 +89,7 @@ public class AuthenticationService {
         }
         return renewedToken;
     }
+
     public String resolveToken(HttpServletRequest request) {
         // Lógica para extraer el token del encabezado de la solicitud
         final String header = request.getHeader("Authorization");
@@ -90,7 +98,6 @@ public class AuthenticationService {
         if (header != null && header.startsWith("Bearer ")) {
             return header.substring(7); // Quita el prefijo "Bearer " del token
         }
-
         return null; // Retorna null si no se encontró un token válido en el encabezado
     }
 }

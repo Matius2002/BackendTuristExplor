@@ -1,5 +1,9 @@
-package org.example.proyecturitsexplor.Servicios;
+/*Objetivo: El propósito de este servicio es generar un reporte en formato Excel (archivo .xlsx) que contenga información sobre las 
+visitas registradas en la base de datos. El reporte se genera dinámicamente y se envía al cliente como un archivo descargable a través 
+de una respuesta HTTP.*/
+package org.example.proyecturitsexplor.Servicios; /*Paquete*/
 
+/*Importaciones*/
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -9,16 +13,17 @@ import org.example.proyecturitsexplor.Entidades.Visita;
 import org.example.proyecturitsexplor.Repositorios.VisitaRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.util.List;
 
 @Service
 public class VisitaService {
 
+    /*Dependencias*/
     @Autowired
     private VisitaRepositorio visitaRepositorio;
 
+    /*Método*/
     public void generarReporteExcel(List<Visita> visitas, HttpServletResponse response) throws IOException, IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Visitas");

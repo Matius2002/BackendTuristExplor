@@ -1,4 +1,9 @@
-package org.example.proyecturitsexplor.Servicios;
+/*Objetivo: proporciona operaciones CRUD para la entidad AtracionPrincipal. A través de este servicio, las atracciones principales pueden 
+ser creadas, leídas, actualizadas y eliminadas en la base de datos. Además, incluye un método para verificar la existencia de una atracción 
+principal por nombre, lo cual es útil para evitar duplicados.*/
+package org.example.proyecturitsexplor.Servicios; /*Paquete*/
+
+/*Importaciones*/
 import org.example.proyecturitsexplor.Entidades.AtracionPrincipal;
 import org.example.proyecturitsexplor.Excepciones.AtracionPrincipalNotFoundException;
 import org.example.proyecturitsexplor.Repositorios.AtracionPrincipalRepositorio;
@@ -6,12 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+/*Servicio y clase*/
 @Service
 public class AtracionPrincipalServicio {
 
+    /*Dependencia y variable*/
     @Autowired
     private AtracionPrincipalRepositorio atracionPrincipalRepositorio;
 
+    /*Métodos*/
     public AtracionPrincipalServicio(AtracionPrincipalRepositorio atracionPrincipalRepositorio) {
         this.atracionPrincipalRepositorio = atracionPrincipalRepositorio;
     }

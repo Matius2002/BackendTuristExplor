@@ -1,4 +1,4 @@
-package org.example.proyecturitsexplor.Servicios;
+package org.example.proyecturitsexplor.Servicios; /*Paquete*/
 
-public class TouristSiteServicio {
+public class TouristSiteServicio { /*Clase*/
 }

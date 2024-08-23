@@ -1,6 +1,9 @@
-package org.example.proyecturitsexplor.Servicios.auth;
+/*Objetivo: Define una clase SecretKey que contiene una propiedad secretKey. La propiedad secretKey es una cadena larga 
+que parece ser una clave secreta codificada en Base64. Esta clase se utiliza en otros servicios, probablemente para firmar 
+o verificar tokens JWT (JSON Web Tokens).*/
+package org.example.proyecturitsexplor.Servicios.auth; /*Paquete*/
 
-public class SecretKey {
+public class SecretKey { /*Clase*/
     public String secretKey="ZXN0YSBlcyB1bmEgY2xhdmUgc2VjcmV0ZSBlbmNyaXB0YWRhIGVuIGJhc2U2" +
             "NCgoanN3b2lqZGVkd2xtbDNybGVtdmw0dGtlbXZsa2V2bGVydmpscm5janduZWNqd2VqY3duamtjbn" +
             "dranJjd2tqbmRjd2tqZWRlamRsZWpqd2VsY2p3bGpjbndqY3dqZGx3ZWpka3dlw7F3a3JqaWxkamlq" +

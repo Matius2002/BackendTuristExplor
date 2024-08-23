@@ -1,4 +1,9 @@
-package org.example.proyecturitsexplor.Servicios;
+/*Objetivo: proporciona funcionalidades para gestionar el almacenamiento y manejo de imágenes en la aplicación. Permite guardar archivos 
+de imagen en el sistema de archivos, registrar la información de estas imágenes en la base de datos, y realizar operaciones CRUD sobre las 
+entidades Images.*/
+package org.example.proyecturitsexplor.Servicios; /*Paquete*/
+
+/*Importaciones*/
 import org.example.proyecturitsexplor.Entidades.Images;
 import org.example.proyecturitsexplor.Excepciones.ImagesNotFoundException;
 import org.example.proyecturitsexplor.Repositorios.ImagesRepositorio;
@@ -9,11 +14,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
+/*Servicio y clasa*/
 @Service
 public class ImagesServicio {
+
+    /*Dependencia y variable*/
     @Autowired
     private ImagesRepositorio imagesRepositorio;
 
+    /*Métodos*/
     public ImagesServicio(ImagesRepositorio imagesRepositorio) {
         this.imagesRepositorio = imagesRepositorio;
     }

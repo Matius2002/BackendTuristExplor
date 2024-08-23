@@ -1,6 +1,12 @@
-package org.example.proyecturitsexplor.Servicios;
+/*Objetivo: proporciona una funcionalidad básica para registrar acciones de auditoría. Actualmente, la implementación se limita a imprimir 
+la información en la consola, pero se deja espacio para expandir la funcionalidad, como guardar estos registros en una base de datos o en 
+un archivo de registro.*/
+package org.example.proyecturitsexplor.Servicios; /*Paquete*/
+
+/*Importaciones*/
 import org.springframework.stereotype.Service;
 
+/*Servicio y clase*/
 @Service
 public class AuditoriaServicio {
 

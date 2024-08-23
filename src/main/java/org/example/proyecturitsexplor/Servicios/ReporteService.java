@@ -1,6 +1,8 @@
-package org.example.proyecturitsexplor.Servicios;
+/*Objetivo: Cuyo objetivo es generar y exportar reportes en diferentes formatos (PDF y Excel) basados en datos de usuarios 
+y experiencias almacenados en la base de datos.*/
+package org.example.proyecturitsexplor.Servicios; /*Paquete*/
 
-
+/*Importaciones*/
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
@@ -19,24 +21,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+/*Servicio y clase*/
 @Service
 public class ReporteService {
 
+    /*Variables y dependencias*/
     private static final Logger logger = LoggerFactory.getLogger(ReporteService.class);
-
     @Autowired
     private UserRepositorio userRepositorio;
-
     @Autowired
     private ExperienciaRepositorio experienciaRepositorio;
 
+    /*Métodos*/
     public void exportarUsuariosExcel(HttpServletResponse response) throws IOException {
         List<Usuarios> usuarios = userRepositorio.findAll();
 
@@ -160,6 +162,4 @@ public class ReporteService {
             return new ByteArrayInputStream(new byte[0]);
         }
     }
-
-
 }

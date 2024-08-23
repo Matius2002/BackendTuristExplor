@@ -1,20 +1,29 @@
-package org.example.proyecturitsexplor.Servicios;
+/*Objetivo: proporciona operaciones CRUD para la entidad Alojamiento. A través de este servicio, los alojamientos turísticos pueden 
+ser creados, leídos, actualizados y eliminados en la base de datos. Además, incluye un método para verificar la existencia de un alojamiento 
+por nombre, lo cual es útil para evitar duplicados.*/
+package org.example.proyecturitsexplor.Servicios; /*Paquete*/
+
+/*Importaciones*/
 import org.example.proyecturitsexplor.Entidades.Alojamiento;
 import org.example.proyecturitsexplor.Excepciones.AlojamientoNotFoundException;
 import org.example.proyecturitsexplor.Repositorios.AlojamientoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+
+/*Servicio y clase*/
 @Service
 public class AlojamientoServicio {
+    /*Dependencia y variable*/
     @Autowired
     private AlojamientoRepositorio alojamientoRepositorio;
 
+    /*Métodos*/
     public AlojamientoServicio(AlojamientoRepositorio alojamientoRepositorio) {
         this.alojamientoRepositorio = alojamientoRepositorio;
     }
-    //CRUD
 
+    //CRUD
     //Obtener todos los alojamientos turisticos
     public List<Alojamiento> obtenerTodosLosAlojamientos () {
         return alojamientoRepositorio.findAll();

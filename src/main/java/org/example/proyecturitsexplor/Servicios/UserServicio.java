@@ -1,5 +1,9 @@
-package org.example.proyecturitsexplor.Servicios;
+/*Objetivo: El servicio se encarga de realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre la entidad Usuarios 
+en la base de datos. También incluye métodos para verificar la existencia de usuarios en la base de datos y para manejar contraseñas 
+de manera segura utilizando la codificación.*/
+package org.example.proyecturitsexplor.Servicios; /*Paquete*/
 
+/*Importaciones*/
 import org.example.proyecturitsexplor.Entidades.Rol;
 import org.example.proyecturitsexplor.Entidades.Usuarios;
 import org.example.proyecturitsexplor.Excepciones.UserNotFoundException;
@@ -10,13 +14,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/*Servicio y clase*/
 @Service
 public class UserServicio {
+
+    /*Variables y inyección de dependencias*/
     @Autowired
     private UserRepositorio userRepositorio;
     @Autowired
@@ -65,8 +71,6 @@ public class UserServicio {
     public boolean verificarExistentePorEmail(String email){
         return userRepositorio.existsByEmail(email);
     }
-
-
 
     public Usuarios obtenerUsuariosPorEmail(String email) {
         Usuarios usuario=null;

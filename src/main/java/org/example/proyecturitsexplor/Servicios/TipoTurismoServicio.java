@@ -1,4 +1,8 @@
-package org.example.proyecturitsexplor.Servicios;
+/*Objetivo: Este servicio se encarga de realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre los tipos de turismo 
+en la base de datos.*/
+package org.example.proyecturitsexplor.Servicios; /*Paquete*/
+
+/*Importaciones*/
 import org.example.proyecturitsexplor.Entidades.TipoTurismo;
 import org.example.proyecturitsexplor.Excepciones.TipoTurismoNotFoundException;
 import org.example.proyecturitsexplor.Repositorios.TipoTurismoRepositorio;
@@ -6,14 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+/*Clase y servicio*/
 @Service
 public class TipoTurismoServicio {
+    /*Variable y inyección de dependencia*/
     @Autowired
     private TipoTurismoRepositorio tipoTurismoRepositorio;
 
     public TipoTurismoServicio(TipoTurismoRepositorio tipoTurismoRepositorio) { this.tipoTurismoRepositorio = tipoTurismoRepositorio;}
+    
     //CRUD
-
     //Obtener todos los Tipos de turismo
     public List<TipoTurismo> obtenerTodosLosTiposTurismo () {
         return tipoTurismoRepositorio.findAll();

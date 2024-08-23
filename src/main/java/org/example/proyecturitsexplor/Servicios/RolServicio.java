@@ -1,4 +1,8 @@
-package org.example.proyecturitsexplor.Servicios;
+/*Objetivo: Este servicio gestiona la lógica de negocio relacionada con la entidad Rol, que representa roles de usuario en la aplicación. 
+La clase RolServicio proporciona métodos CRUD (Crear, Leer, Actualizar, Eliminar) para manejar los roles en la base de datos.*/
+package org.example.proyecturitsexplor.Servicios; /*Paquete*/
+
+/*Importaciones*/
 import org.example.proyecturitsexplor.Entidades.Rol;
 import org.example.proyecturitsexplor.Excepciones.RolNotFoundException;
 import org.example.proyecturitsexplor.Repositorios.RolRepositorio;
@@ -7,15 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+/*Servicio y clase*/
 @Service
 public class RolServicio {
+
+    /*Dependencias y variables*/
     @Autowired
     private RolRepositorio rolRepositorio;
     @Autowired
     private UserRepositorio userRepositorio;
 
     //CRUD
-
     //Obtener todos los roles
     public List<Rol> obtenerTodosLosRoles () {
         return rolRepositorio.findAll();
