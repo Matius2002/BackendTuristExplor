@@ -1,4 +1,5 @@
 package org.example.proyecturitsexplor.Seguridad.filter;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
