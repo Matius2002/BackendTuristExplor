@@ -20,6 +20,7 @@ import java.util.List;
 public class VisitaService {
 
     /*Dependencias*/
+    @SuppressWarnings("unused")
     @Autowired
     private VisitaRepositorio visitaRepositorio;
 

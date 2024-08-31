@@ -27,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { /*es una cla
   private UserRepositorio userRep;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException { /*es el método principal que se ejecuta cada vez que se intercepta una solicitud HTTP. Aquí es donde se realiza la lógica de autenticación*/
+    protected void doFilterInternal(@SuppressWarnings("null") HttpServletRequest request, @SuppressWarnings("null") HttpServletResponse response, @SuppressWarnings("null") FilterChain filterChain) throws ServletException, IOException { /*es el método principal que se ejecuta cada vez que se intercepta una solicitud HTTP. Aquí es donde se realiza la lógica de autenticación*/
            String authorization = request.getHeader("Authorization"); /*El filtro primero intenta obtener el token JWT del encabezado Authorization de la solicitud. Si el encabezado no está presente o no comienza con "Bearer ", el filtro simplemente pasa la solicitud al siguiente filtro en la cadena*/
             if (!StringUtils.hasText(authorization) || !authorization.startsWith("Bearer ")) {
                 filterChain.doFilter(request, response);

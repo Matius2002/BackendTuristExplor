@@ -15,12 +15,15 @@ import java.util.List;
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:8080")
 public class RolControlador {
+    @SuppressWarnings("unused")
     @Autowired
     private RolRepositorio rolRepositorio;
     @Autowired
     private RolServicio rolServicio;
+    @SuppressWarnings("unused")
     @Autowired
     private UserServicio userServicio;
+    @SuppressWarnings("unused")
     @Autowired
     private AuditoriaServicio auditoriaService;
 

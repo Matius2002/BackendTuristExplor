@@ -17,6 +17,7 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:8080")
 public class AtracionPrincipalControlador {
     /*Inyección de dependencias*/
+    @SuppressWarnings("unused")
     @Autowired
     private AtracionPrincipalRepositorio atracionPrincipalRepositorio;
     @Autowired

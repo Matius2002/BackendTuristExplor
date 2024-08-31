@@ -18,6 +18,7 @@ public class RolServicio {
     /*Dependencias y variables*/
     @Autowired
     private RolRepositorio rolRepositorio;
+    @SuppressWarnings("unused")
     @Autowired
     private UserRepositorio userRepositorio;
 

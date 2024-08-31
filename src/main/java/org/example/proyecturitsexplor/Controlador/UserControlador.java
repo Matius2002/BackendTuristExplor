@@ -19,6 +19,7 @@ import java.util.Map;
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:8080")
 public class UserControlador {
+    @SuppressWarnings("unused")
     @Autowired
     private UserRepositorio userRepositorio;
     @Autowired

@@ -41,6 +41,7 @@ public class ImagesServicio {
         }
 
         // Obtener la extensión del archivo original
+        @SuppressWarnings("null")
         String extension = archivo.getOriginalFilename().substring(archivo.getOriginalFilename().lastIndexOf('.'));
 
         // Definir la ruta completa donde se guardará el archivo con el nuevo nombre

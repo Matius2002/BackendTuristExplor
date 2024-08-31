@@ -13,6 +13,7 @@ import java.util.List;
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:8080")
 public class EpocaVisitarControlador {
+    @SuppressWarnings("unused")
     @Autowired
     private EpocaVisitarRepositorio epocaVisitarRepositorio;
     @Autowired

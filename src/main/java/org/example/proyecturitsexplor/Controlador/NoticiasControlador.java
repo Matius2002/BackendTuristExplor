@@ -13,6 +13,7 @@ import java.util.List;
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:8080")
 public class NoticiasControlador {
+    @SuppressWarnings("unused")
     @Autowired
     private NoticiasRepositorio noticiasRepositorio;
     @Autowired

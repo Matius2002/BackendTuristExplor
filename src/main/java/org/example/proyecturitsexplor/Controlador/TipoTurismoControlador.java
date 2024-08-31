@@ -14,6 +14,7 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:8080")
 public class TipoTurismoControlador {
 
+    @SuppressWarnings("unused")
     @Autowired
     private TipoTurismoRepositorio tipoTurismoRepositorio;
     @Autowired

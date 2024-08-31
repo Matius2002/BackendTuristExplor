@@ -21,6 +21,7 @@ import java.util.List;
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:8080")
 public class ImagesControlador {
+    @SuppressWarnings("unused")
     @Autowired
     private ImagesRepositorio imagesRepositorio;
 
