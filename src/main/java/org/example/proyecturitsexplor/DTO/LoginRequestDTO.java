@@ -1,5 +1,3 @@
-/*Objetivo: Es un objeto de transferencia de datos que encapsula la información básica necesaria 
-para procesar una solicitud de inicio de sesión*/
 package org.example.proyecturitsexplor.DTO; /*Paquete*/
 
 /*Clase*/

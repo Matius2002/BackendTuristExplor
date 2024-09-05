@@ -1,4 +1,3 @@
-/*Objetivo: proporcionar una forma estructurada de manejar y transmitir información sobre errores*/
 package org.example.proyecturitsexplor.DTO; /*Paquete*/
 
 /*Clase*/

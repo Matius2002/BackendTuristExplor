@@ -14,6 +14,7 @@ import java.util.List;
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:8080")
 public class ExperienciaControlador {
+
     @SuppressWarnings("unused")
     @Autowired
     private ExperienciaRepositorio experienciaRepositorio;
@@ -21,50 +22,25 @@ public class ExperienciaControlador {
     private ExperienciaServicio experienciaServicio;
 
     // CRUD
-    /*
-     * @PostMapping("/experiencias/guardarExperiencia")
-     * public ResponseEntity<Experiencia> guardarExperiencia(@RequestBody
-     * Experiencia experiencia) {
-     * if (experiencia.getDestino() == null || experiencia.getUsuario() == null ||
-     * experiencia.getCalificacion() == null || experiencia.getComentario() == null
-     * || experiencia.getFecha() == null) {
-     * return ResponseEntity.badRequest().build();
-     * }
-     * Experiencia experienciaGuardado =
-     * experienciaServicio.guardarExperiencia(experiencia);
-     * return ResponseEntity.status(HttpStatus.CREATED).body(experienciaGuardado);
-     * }
-     */
 
     @PostMapping("/experiencias/guardarExperiencia")
-    public ResponseEntity<?> guardarExperiencia(@RequestBody Experiencia experiencia) {
-        // Validar que todos los campos requeridos no sean nulos ni vacíos
-        if (experiencia.getDestino() == null) {
-            return ResponseEntity.badRequest().body("El destino no puede estar vacío.");
-        }
-        if (experiencia.getUsuario() == null) {
-            return ResponseEntity.badRequest().body("El usuario no puede estar vacío.");
-        }
-        if (experiencia.getCalificacion() == null) {
-            return ResponseEntity.badRequest().body("La calificación no puede estar vacía.");
-        }
-        if (experiencia.getComentario() == null || experiencia.getComentario().isEmpty()) {
-            return ResponseEntity.badRequest().body("El comentario no puede estar vacío.");
-        }
-        if (experiencia.getFecha() == null) {
-            return ResponseEntity.badRequest().body("La fecha no puede estar vacía.");
-        }
+public ResponseEntity<?> guardarExperiencia(@RequestBody Experiencia experiencia) {
+    // Logs detallados de los valores recibidos
+    System.out.println("Datos completos de la experiencia: " + experiencia);
+    System.out.println("Destino: " + (experiencia.getDestino() != null ? experiencia.getDestino().getId() : "null"));
+    System.out.println("Usuario: " + (experiencia.getUsuario() != null ? experiencia.getUsuario().getId() : "null"));
 
-        // Guardar la experiencia
-        try {
-            Experiencia experienciaGuardada = experienciaServicio.guardarExperiencia(experiencia);
-            return ResponseEntity.status(HttpStatus.CREATED).body(experienciaGuardada);
-        } catch (Exception e) {
-            // Manejo de otros errores
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al guardar la experiencia: " + e.getMessage());
-        }
+    if (experiencia.getDestino() == null || experiencia.getDestino().getId() == null) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El destino no puede estar vacío.");
     }
+    if (experiencia.getUsuario() == null || experiencia.getUsuario().getId() == null) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario no puede estar vacío.");
+    }
+
+    Experiencia experienciaGuardada = experienciaServicio.guardarExperiencia(experiencia);
+    return ResponseEntity.status(HttpStatus.CREATED).body(experienciaGuardada);
+}
+
 
     // Recuperar todos las experiencia
     @GetMapping("/experiencias/obtenerTodosLosExperiencia")

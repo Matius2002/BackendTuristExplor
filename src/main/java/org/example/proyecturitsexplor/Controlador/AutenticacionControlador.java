@@ -31,5 +31,4 @@ public class AutenticacionControlador {
         boolean isTokenValid = this.authService.validateToken(token); //Llama al servicio de autenticación (authService.validateToken(token)) para verificar si el token es válido.
         return ResponseEntity.ok(isTokenValid); //devuelve una respuesta HTTP 200 con un valor booleano (true o false) que indica si el token es válido o no.
     }
-
 }
