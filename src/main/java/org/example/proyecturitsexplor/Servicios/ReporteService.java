@@ -2,11 +2,15 @@
 y experiencias almacenados en la base de datos.*/
 package org.example.proyecturitsexplor.Servicios; /*Paquete*/
 
+import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.font.PdfFontFactory;
 /*Importaciones*/
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.properties.TextAlignment;
+
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Row;
@@ -38,13 +42,11 @@ public class ReporteService {
     @Autowired
     private ExperienciaRepositorio experienciaRepositorio;
 
-    /*Métodos*/
+    /*Método de reporte de usuarios Excel*/
     public void exportarUsuariosExcel(HttpServletResponse response) throws IOException {
         List<Usuarios> usuarios = userRepositorio.findAll();
-
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Usuarios");
-
         Row header = sheet.createRow(0);
         header.createCell(0).setCellValue("ID");
         header.createCell(1).setCellValue("Nombre de Usuario");
@@ -69,13 +71,26 @@ public class ReporteService {
         }
     }
 
+    //Método de reporte para usuarios en PDF
     public ByteArrayInputStream exportarUsuariosPDF() {
         List<Usuarios> usuarios = userRepositorio.findAll();
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            //Configurar el documento PDF
             PdfWriter writer = new PdfWriter(out);
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
+
+            //Encabezado personalizado
+            Paragraph title = new Paragraph("Reporte de usuarios")
+                .setFont(PdfFontFactory.createFont("Helvetica-Bold"))
+                .setFontSize(20)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setBold()
+                .setFontColor(new DeviceRgb(0,102,204));
+            document.add(title);
+
+
 
             for (Usuarios usuario : usuarios) {
                 document.add(new Paragraph("ID: " + usuario.getId()));
@@ -92,6 +107,8 @@ public class ReporteService {
             return new ByteArrayInputStream(new byte[0]);
         }
     }
+
+    //Método para comentarios en PDF y Excel
     public InputStream generarReporteComentarios(String format) {
         if (format.equals("pdf")) {
             return generarReporteComentariosPDF();
@@ -101,6 +118,8 @@ public class ReporteService {
             throw new IllegalArgumentException("Formato no soportado: " + format);
         }
     }
+
+    //Método para comentarios en Excel
     public ByteArrayInputStream generarReporteComentariosExcel() {
         List<Experiencia> experiencias = experienciaRepositorio.findAll();
 
@@ -135,6 +154,8 @@ public class ReporteService {
             return new ByteArrayInputStream(new byte[0]);
         }
     }
+
+    //Método para comentarios en PDF
     public ByteArrayInputStream generarReporteComentariosPDF() {
         List<Experiencia> experiencias = experienciaRepositorio.findAll();
 
