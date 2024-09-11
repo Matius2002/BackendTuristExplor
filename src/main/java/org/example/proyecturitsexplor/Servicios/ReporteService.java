@@ -10,6 +10,7 @@ import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
@@ -17,6 +18,7 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
+import com.itextpdf.layout.properties.VerticalAlignment;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
@@ -88,39 +90,54 @@ public class ReporteService {
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
 
-            // Titulo
-            Paragraph title = new Paragraph("Reporte de usuarios registrados")
-                    .setFont(PdfFontFactory.createFont("Helvetica-Bold"))
-                    .setFontSize(20)
-                    .setTextAlignment(TextAlignment.CENTER)
-                    .setBold()
-                    .setFontColor(new DeviceRgb(0, 102, 204));
-            document.add(title);
+            // Tabla para organizar el logo y el título en la misma línea
+            Table headerTable = new Table(new float[]{1, 2}); // Dos columnas: 1 para el logo y 1 para el título
+            headerTable.setWidth(UnitValue.createPercentValue(100)); // Ocupa el 100% del ancho
 
-            // Logo
-            /*String logoPath = "/src/main/images/iconoalcaldia.png"; // Asegúrate de cambiar esta ruta
-            Image logo = new Image(ImageDataFactory.create(logoPath)).setWidth(100)
-                    .setHorizontalAlignment(HorizontalAlignment.CENTER);
-            document.add(logo);*/
+            //Logo
+        String logoPath = "src/main/images/simboloalcaldia.png"; // Asegúrate de cambiar esta ruta
+        Image logo = new Image(ImageDataFactory.create(logoPath)).setWidth(60).setHorizontalAlignment(HorizontalAlignment.LEFT);
+        Cell logoCell = new Cell().add(logo).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT).setVerticalAlignment(VerticalAlignment.MIDDLE); // Alineación vertical al centro
+        headerTable.addCell(logoCell);
 
-            // Tabla para organizar los datos de los usuarios
-            Table table = new Table(new float[] { 2, 4, 4, 4 }); // Define el número de columnas y sus anchos relativos
-            table.setWidth(UnitValue.createPercentValue(100));
+            // Título centrado en la segunda columna
+        Paragraph title = new Paragraph("Reporte de Usuarios Registrados").setFont(PdfFontFactory.createFont("Helvetica-Bold")).setFontSize(20).setBold().setFontColor(new DeviceRgb(0, 102, 204)).setTextAlignment(TextAlignment.CENTER);
+        Cell titleCell = new Cell().add(title).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.CENTER).setVerticalAlignment(VerticalAlignment.MIDDLE); // Alineación vertical al centro
+        headerTable.addCell(titleCell);
 
-            table.addHeaderCell(new Cell().add(new Paragraph("ID").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Nombre de Usuario").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Email").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Fecha de Registro").setBold()));
+        // Añadir la tabla con el logo y el título al documento
+        document.add(headerTable);
+
+        // Espacio entre el encabezado y la tabla de datos
+        document.add(new Paragraph(" "));
+
+            // Añadir la leyenda o descripción del reporte
+        Paragraph legend = new Paragraph("Este reporte detalla los usuarios registrados en el sistema, mostrando información clave como el nombre de usuario, el correo electrónico y la fecha de registro.").setFontSize(12).setTextAlignment(TextAlignment.LEFT).setMarginTop(10).setFontColor(ColorConstants.DARK_GRAY);
+        document.add(legend);
+
+        // Espacio entre la leyenda y la tabla de datos
+        document.add(new Paragraph(" "));
+
+        // Tabla para organizar los datos de los usuarios
+        Table table = new Table(new float[] { 2, 4, 4, 4 }); // Define el número de columnas y sus anchos relativos
+        table.setWidth(UnitValue.createPercentValue(100));
+
+        //Encabezado de la tabla
+        table.addHeaderCell(new Cell().add(new Paragraph("ID").setBold()));
+        table.addHeaderCell(new Cell().add(new Paragraph("Nombre de Usuario").setBold()));
+        table.addHeaderCell(new Cell().add(new Paragraph("Email").setBold()));
+        table.addHeaderCell(new Cell().add(new Paragraph("Fecha de Registro").setBold()));
             
-
-            for (Usuarios usuario : usuarios) {
-                table.addCell(new Paragraph(String.valueOf(usuario.getId())));
-                table.addCell(new Paragraph(usuario.getNombreUsuario()));
-                table.addCell(new Paragraph(usuario.getEmail()));
-                table.addCell(new Paragraph(usuario.getFechaRegistro().toString()));
-            }
-
-            document.add(table);
+            //Filas de la tabla con los datos de los usuarios
+        for (Usuarios usuario : usuarios) {
+            table.addCell(new Paragraph(String.valueOf(usuario.getId())));
+            table.addCell(new Paragraph(usuario.getNombreUsuario()));
+            table.addCell(new Paragraph(usuario.getEmail()));
+            table.addCell(new Paragraph(usuario.getFechaRegistro().toString()));
+        }
+        
+        //Añadir la tabla al documento
+        document.add(table);
 
             // Pie de página
             Paragraph footer = new Paragraph("Reporte generado el: " + java.time.LocalDate.now())
@@ -133,7 +150,7 @@ public class ReporteService {
             document.close();
             return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
-            logger.error("Error al exportar usuarios a PDF", e);
+            logger.error("Error al generar reporte en PDF de usuarios", e);
             return new ByteArrayInputStream(new byte[0]);
         }
     }
@@ -194,29 +211,76 @@ public class ReporteService {
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
 
-            document.add(new Paragraph("Reporte de Comentarios"));
+            // Tabla para organizar el logo y el título en la misma línea
+            Table headerTable = new Table(new float[]{1, 4}); // Más espacio para la columna del título
+            headerTable.setWidth(UnitValue.createPercentValue(100)); // Ocupa el 100% del ancho
 
-            for (Experiencia experiencia : experiencias) {
-                document.add(new Paragraph("ID: " + experiencia.getId()));
-                document.add(new Paragraph("Destino: " + experiencia.getDestino().getDestinoName())); // Asumiendo que
-                                                                                                      // Destino tiene
-                                                                                                      // un campo
-                                                                                                      // 'nombre'
-                document.add(new Paragraph("Usuario: " + experiencia.getUsuario().getNombreUsuario())); // Asumiendo que
-                                                                                                        // Usuario tiene
-                                                                                                        // un campo
-                                                                                                        // 'nombreUsuario'
-                document.add(new Paragraph("Calificación: " + experiencia.getCalificacion()));
-                document.add(new Paragraph("Comentario: " + experiencia.getComentario()));
-                document.add(new Paragraph("Fecha: " + experiencia.getFecha().toString()));
-                document.add(new Paragraph(" "));
-            }
+            // Logo en la primera columna
+            String logoPath = "src/main/images/simboloalcaldia.png"; // Cambia la ruta si es necesario
+            Image logo = new Image(ImageDataFactory.create(logoPath)).setWidth(60).setHorizontalAlignment(HorizontalAlignment.LEFT);
+            Cell logoCell = new Cell().add(logo).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT).setVerticalAlignment(VerticalAlignment.MIDDLE); // Alineación vertical al centro
+            headerTable.addCell(logoCell);
 
-            document.close();
-            return new ByteArrayInputStream(out.toByteArray());
-        } catch (IOException e) {
-            logger.error("Error al generar el reporte de comentarios en PDF", e);
-            return new ByteArrayInputStream(new byte[0]);
+            // Título centrado en la segunda columna
+        Paragraph title = new Paragraph("Reporte de Comentarios").setFont(PdfFontFactory.createFont("Helvetica-Bold")).setFontSize(20).setBold().setFontColor(new DeviceRgb(0, 102, 204)).setTextAlignment(TextAlignment.CENTER);
+        Cell titleCell = new Cell().add(title).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.CENTER).setVerticalAlignment(VerticalAlignment.MIDDLE); // Alineación vertical al centro
+        headerTable.addCell(titleCell);
+            
+            // Añadir la tabla con el logo y el título al documento
+            document.add(headerTable);
+
+            // Espacio entre el encabezado y la tabla de datos
+            document.add(new Paragraph(" "));
+
+            // Añadir la leyenda o descripción del reporte
+            Paragraph legend = new Paragraph("Este reporte detalla los comentarios y calificaciones realizados por los usuarios sobre sus experiencias en los diferentes destinos.")
+                .setFontSize(12)
+                .setTextAlignment(TextAlignment.LEFT)
+                .setMarginTop(10)
+                .setFontColor(ColorConstants.DARK_GRAY);
+            document.add(legend);
+
+            // Espacio entre la leyenda y la tabla de datos
+            document.add(new Paragraph(" "));
+
+            // Tabla para organizar los datos de los comentarios
+            Table table = new Table(new float[]{1, 3, 2, 1, 5, 2}); // Define el número de columnas y sus anchos relativos
+            table.setWidth(UnitValue.createPercentValue(100));
+                // Encabezado de la tabla
+            table.addHeaderCell(new Cell().add(new Paragraph("ID").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Destino").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Usuario").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Calificación").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Comentario").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Fecha").setBold()));
+
+        // Filas de la tabla con los datos de los comentarios
+        for (Experiencia experiencia : experiencias) {
+            table.addCell(new Paragraph(String.valueOf(experiencia.getId())));
+            table.addCell(new Paragraph(experiencia.getDestino() != null ? experiencia.getDestino().getDestinoName() : "Sin destino"));
+            table.addCell(new Paragraph(experiencia.getUsuario() != null ? experiencia.getUsuario().getNombreUsuario() : "Anónimo"));
+            table.addCell(new Paragraph(String.valueOf(experiencia.getCalificacion())));
+            table.addCell(new Paragraph(experiencia.getComentario() != null ? experiencia.getComentario() : "Sin comentario"));
+            table.addCell(new Paragraph(experiencia.getFecha() != null ? experiencia.getFecha().toString() : "Fecha desconocida"));
         }
+
+        // Añadir la tabla al documento
+        document.add(table);
+
+        // Pie de página
+        Paragraph footer = new Paragraph("Reporte generado el: " + java.time.LocalDate.now())
+                .setFontSize(10)
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setMarginTop(30)
+                .setFontColor(ColorConstants.GRAY);
+        document.add(footer);
+
+        // Cerrar el documento
+        document.close();
+        return new ByteArrayInputStream(out.toByteArray());
+    } catch (IOException e) {
+        logger.error("Error al generar el reporte de comentarios en PDF", e);
+        return new ByteArrayInputStream(new byte[0]);
+    }
     }
 }
