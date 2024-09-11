@@ -2,14 +2,21 @@
 y experiencias almacenados en la base de datos.*/
 package org.example.proyecturitsexplor.Servicios; /*Paquete*/
 
+/*Importaciones*/
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFontFactory;
-/*Importaciones*/
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,14 +42,14 @@ import java.util.List;
 @Service
 public class ReporteService {
 
-    /*Variables y dependencias*/
+    /* Variables y dependencias */
     private static final Logger logger = LoggerFactory.getLogger(ReporteService.class);
     @Autowired
     private UserRepositorio userRepositorio;
     @Autowired
     private ExperienciaRepositorio experienciaRepositorio;
 
-    /*Método de reporte de usuarios Excel*/
+    /* Método de reporte de usuarios Excel */
     public void exportarUsuariosExcel(HttpServletResponse response) throws IOException {
         List<Usuarios> usuarios = userRepositorio.findAll();
         Workbook workbook = new XSSFWorkbook();
@@ -71,34 +78,57 @@ public class ReporteService {
         }
     }
 
-    //Método de reporte para usuarios en PDF
+    // Método de reporte para usuarios en PDF
     public ByteArrayInputStream exportarUsuariosPDF() {
         List<Usuarios> usuarios = userRepositorio.findAll();
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            //Configurar el documento PDF
+            // Configurar el documento PDF
             PdfWriter writer = new PdfWriter(out);
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
 
-            //Encabezado personalizado
-            Paragraph title = new Paragraph("Reporte de usuarios")
-                .setFont(PdfFontFactory.createFont("Helvetica-Bold"))
-                .setFontSize(20)
-                .setTextAlignment(TextAlignment.CENTER)
-                .setBold()
-                .setFontColor(new DeviceRgb(0,102,204));
+            // Titulo
+            Paragraph title = new Paragraph("Reporte de usuarios registrados")
+                    .setFont(PdfFontFactory.createFont("Helvetica-Bold"))
+                    .setFontSize(20)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setBold()
+                    .setFontColor(new DeviceRgb(0, 102, 204));
             document.add(title);
 
+            // Logo
+            /*String logoPath = "/src/main/images/iconoalcaldia.png"; // Asegúrate de cambiar esta ruta
+            Image logo = new Image(ImageDataFactory.create(logoPath)).setWidth(100)
+                    .setHorizontalAlignment(HorizontalAlignment.CENTER);
+            document.add(logo);*/
 
+            // Tabla para organizar los datos de los usuarios
+            Table table = new Table(new float[] { 2, 4, 4, 4 }); // Define el número de columnas y sus anchos relativos
+            table.setWidth(UnitValue.createPercentValue(100));
+
+            table.addHeaderCell(new Cell().add(new Paragraph("ID").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Nombre de Usuario").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Email").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Fecha de Registro").setBold()));
+            
 
             for (Usuarios usuario : usuarios) {
-                document.add(new Paragraph("ID: " + usuario.getId()));
-                document.add(new Paragraph("Nombre de Usuario: " + usuario.getNombreUsuario()));
-                document.add(new Paragraph("Email: " + usuario.getEmail()));
-                document.add(new Paragraph("Fecha de Registro: " + usuario.getFechaRegistro().toString()));
-                document.add(new Paragraph(" "));
+                table.addCell(new Paragraph(String.valueOf(usuario.getId())));
+                table.addCell(new Paragraph(usuario.getNombreUsuario()));
+                table.addCell(new Paragraph(usuario.getEmail()));
+                table.addCell(new Paragraph(usuario.getFechaRegistro().toString()));
             }
+
+            document.add(table);
+
+            // Pie de página
+            Paragraph footer = new Paragraph("Reporte generado el: " + java.time.LocalDate.now())
+                    .setFontSize(10)
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setMarginTop(30)
+                    .setFontColor(ColorConstants.GRAY);
+            document.add(footer);
 
             document.close();
             return new ByteArrayInputStream(out.toByteArray());
@@ -108,7 +138,7 @@ public class ReporteService {
         }
     }
 
-    //Método para comentarios en PDF y Excel
+    // Método para comentarios en PDF y Excel
     public InputStream generarReporteComentarios(String format) {
         if (format.equals("pdf")) {
             return generarReporteComentariosPDF();
@@ -119,7 +149,7 @@ public class ReporteService {
         }
     }
 
-    //Método para comentarios en Excel
+    // Método para comentarios en Excel
     public ByteArrayInputStream generarReporteComentariosExcel() {
         List<Experiencia> experiencias = experienciaRepositorio.findAll();
 
@@ -155,7 +185,7 @@ public class ReporteService {
         }
     }
 
-    //Método para comentarios en PDF
+    // Método para comentarios en PDF
     public ByteArrayInputStream generarReporteComentariosPDF() {
         List<Experiencia> experiencias = experienciaRepositorio.findAll();
 
@@ -168,8 +198,14 @@ public class ReporteService {
 
             for (Experiencia experiencia : experiencias) {
                 document.add(new Paragraph("ID: " + experiencia.getId()));
-                document.add(new Paragraph("Destino: " + experiencia.getDestino().getDestinoName())); // Asumiendo que Destino tiene un campo 'nombre'
-                document.add(new Paragraph("Usuario: " + experiencia.getUsuario().getNombreUsuario())); // Asumiendo que Usuario tiene un campo 'nombreUsuario'
+                document.add(new Paragraph("Destino: " + experiencia.getDestino().getDestinoName())); // Asumiendo que
+                                                                                                      // Destino tiene
+                                                                                                      // un campo
+                                                                                                      // 'nombre'
+                document.add(new Paragraph("Usuario: " + experiencia.getUsuario().getNombreUsuario())); // Asumiendo que
+                                                                                                        // Usuario tiene
+                                                                                                        // un campo
+                                                                                                        // 'nombreUsuario'
                 document.add(new Paragraph("Calificación: " + experiencia.getCalificacion()));
                 document.add(new Paragraph("Comentario: " + experiencia.getComentario()));
                 document.add(new Paragraph("Fecha: " + experiencia.getFecha().toString()));
