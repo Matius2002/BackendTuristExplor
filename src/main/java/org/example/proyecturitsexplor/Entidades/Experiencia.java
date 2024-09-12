@@ -2,6 +2,8 @@ package org.example.proyecturitsexplor.Entidades;
 import jakarta.persistence.*;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity
 @Table(name = "experiencia")
 public class Experiencia {
@@ -26,6 +28,7 @@ public class Experiencia {
     @Column(name = "comentario")
     private String comentario;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss") // Especifica el formato de fecha
     @Column(name = "fecha", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecha;

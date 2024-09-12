@@ -1,6 +1,7 @@
 package org.example.proyecturitsexplor.Controlador;
 
 import org.example.proyecturitsexplor.Entidades.Experiencia;
+import org.example.proyecturitsexplor.Excepciones.ExperienciaNotFoundException;
 import org.example.proyecturitsexplor.Repositorios.ExperienciaRepositorio;
 import org.example.proyecturitsexplor.Servicios.ExperienciaServicio;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,70 +22,73 @@ public class ExperienciaControlador {
     @Autowired
     private ExperienciaServicio experienciaServicio;
 
-    // CRUD
-
+    // Guardar experiencia
     @PostMapping("/experiencias/guardarExperiencia")
-public ResponseEntity<?> guardarExperiencia(@RequestBody Experiencia experiencia) {
-    // Logs detallados de los valores recibidos
-    System.out.println("Datos completos de la experiencia: " + experiencia);
-    System.out.println("Destino: " + (experiencia.getDestino() != null ? experiencia.getDestino().getId() : "null"));
-    System.out.println("Usuario: " + (experiencia.getUsuario() != null ? experiencia.getUsuario().getId() : "null"));
+    public ResponseEntity<?> guardarExperiencia(@RequestBody Experiencia experiencia) {
+        try {
+            System.out.println("Datos completos de la experiencia: " + experiencia);
+            System.out.println("Destino: " + (experiencia.getDestino() != null ? experiencia.getDestino().getId() : "null"));
+            System.out.println("Usuario: " + (experiencia.getUsuario() != null ? experiencia.getUsuario().getId() : "null"));
 
-    if (experiencia.getDestino() == null || experiencia.getDestino().getId() == null) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El destino no puede estar vacío.");
+            // Validaciones de destino y usuario
+            if (experiencia.getDestino() == null || experiencia.getDestino().getId() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El destino no puede estar vacío.");
+            }
+            if (experiencia.getUsuario() == null || experiencia.getUsuario().getId() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario no puede estar vacío.");
+            }
+
+            Experiencia experienciaGuardada = experienciaServicio.guardarExperiencia(experiencia);
+            return ResponseEntity.status(HttpStatus.CREATED).body(experienciaGuardada);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar la experiencia.");
+        }
     }
-    if (experiencia.getUsuario() == null || experiencia.getUsuario().getId() == null) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario no puede estar vacío.");
-    }
 
-    Experiencia experienciaGuardada = experienciaServicio.guardarExperiencia(experiencia);
-    return ResponseEntity.status(HttpStatus.CREATED).body(experienciaGuardada);
-}
-
-
-    // Recuperar todos las experiencia
+    // Obtener todas las experiencias
     @GetMapping("/experiencias/obtenerTodosLosExperiencia")
     public ResponseEntity<List<Experiencia>> obtenerTodosLosExperiencia() {
-        List<Experiencia> experiencia = experienciaServicio.obtenerTodosLosExperiencia();
-        return ResponseEntity.ok(experiencia);
+        List<Experiencia> experiencias = experienciaServicio.obtenerTodosLosExperiencia();
+        return ResponseEntity.ok(experiencias);
     }
 
-    // recuperar experiencia por id
+    // Obtener experiencia por ID
     @GetMapping("/experiencias/recuperarPorId/{id}")
-    public ResponseEntity<Experiencia> obtenerExperienciaPorId(@PathVariable Long id) {
-        Experiencia experiencia = experienciaServicio.obtenerExperienciaPorId(id);
-        return ResponseEntity.ok(experiencia);
+    public ResponseEntity<?> obtenerExperienciaPorId(@PathVariable Long id) {
+        try {
+            Experiencia experiencia = experienciaServicio.obtenerExperienciaPorId(id);
+            return ResponseEntity.ok(experiencia);
+        } catch (ExperienciaNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
-    // Actulizar experiencia
-    @PutMapping("experiencias/{id}")
-    public ResponseEntity<?> actualizarExperiencia(@PathVariable("id") Long id,
-            @RequestBody Experiencia experienciaActualizada) {
+    // Actualizar experiencia
+    @PutMapping("/experiencias/{id}")
+    public ResponseEntity<?> actualizarExperiencia(@PathVariable("id") Long id, @RequestBody Experiencia experienciaActualizada) {
         try {
-            // Verificar si el ID proporcionado en la ruta coincide con el ID del
-            // experiencia actualizada
             if (!id.equals(experienciaActualizada.getId())) {
-                throw new IllegalArgumentException(
-                        "El ID de la experiencia del cuerpo no coincide con el ID proporcionado en la ruta.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El ID de la experiencia no coincide.");
             }
+
             Experiencia experienciaActual = experienciaServicio.obtenerExperienciaPorId(id);
-            if (experienciaActual == null) {
-                return new ResponseEntity<>("No se encontró ningun experiencia con el ID proporcionado.",
-                        HttpStatus.NOT_FOUND);
-            }
-            Experiencia experienciaActualizadaGuardada = experienciaServicio
-                    .actulizarExperiencia(experienciaActualizada);
-            return new ResponseEntity<>(experienciaActualizadaGuardada, HttpStatus.OK);
+            Experiencia experienciaActualizadaGuardada = experienciaServicio.actulizarExperiencia(experienciaActualizada);
+            return ResponseEntity.ok(experienciaActualizadaGuardada);
+        } catch (ExperienciaNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     // Eliminar experiencia
     @DeleteMapping("/experiencias/{id}")
-    public ResponseEntity<String> eliminarExperienciaPorId(@PathVariable Long id) {
-        experienciaServicio.eliminarExperiencia(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body("Experiencia con ID " + id + " eliminada correctamente.");
+    public ResponseEntity<?> eliminarExperienciaPorId(@PathVariable Long id) {
+        try {
+            experienciaServicio.eliminarExperiencia(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Experiencia eliminada correctamente.");
+        } catch (ExperienciaNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }
