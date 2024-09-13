@@ -26,9 +26,12 @@ public class ExperienciaControlador {
     @PostMapping("/experiencias/guardarExperiencia")
     public ResponseEntity<?> guardarExperiencia(@RequestBody Experiencia experiencia) {
         try {
+            System.out.println("******************");
             System.out.println("Datos completos de la experiencia: " + experiencia);
             System.out.println("Destino: " + (experiencia.getDestino() != null ? experiencia.getDestino().getId() : "null"));
             System.out.println("Usuario: " + (experiencia.getUsuario() != null ? experiencia.getUsuario().getId() : "null"));
+            System.out.println("Destino::::: "+experiencia.getDestino());
+            System.out.println("Usuario::::: "+experiencia.getUsuario());
 
             // Validaciones de destino y usuario
             if (experiencia.getDestino() == null || experiencia.getDestino().getId() == null) {

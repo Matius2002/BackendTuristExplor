@@ -140,7 +140,7 @@ public class Usuarios implements UserDetails {
         return "User{" +
                 "id=" + id +
                 ", nombreUsuario='" + nombreUsuario + '\'' +
-                ", email='" + email + '\'' +
+                ", emailpppp='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", fechaRegistro=" + fechaRegistro +
                 //", rol='" + roles + '\'' +

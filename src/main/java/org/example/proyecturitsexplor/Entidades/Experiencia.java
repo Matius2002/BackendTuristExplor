@@ -53,7 +53,7 @@ public class Experiencia {
         this.id = id;
     }
 
-    public Destinos getDestino() {
+    public Destinos getDestino() { //Aquí esta el método
         return destino;
     }
 
