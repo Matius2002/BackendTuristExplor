@@ -54,6 +54,7 @@ public class Experiencia {
     }
 
     public Destinos getDestino() { //Aquí esta el método
+        System.out.println("***Muestra destino***"+destino);
         return destino;
     }
 
@@ -61,7 +62,8 @@ public class Experiencia {
         this.destino = destino;
     }
 
-    public Usuarios getUsuario() {
+    public Usuarios getUsuario() { //Aquí esta el otro método
+        System.out.println("***Muestra usuario***"+usuario);
         return usuario;
     }
 

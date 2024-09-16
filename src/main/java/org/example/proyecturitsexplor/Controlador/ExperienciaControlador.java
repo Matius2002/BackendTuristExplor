@@ -24,20 +24,17 @@ public class ExperienciaControlador {
 
     // Guardar experiencia
     @PostMapping("/experiencias/guardarExperiencia")
-    public ResponseEntity<?> guardarExperiencia(@RequestBody Experiencia experiencia) {
+    public ResponseEntity<Experiencia> guardarExperiencia(@RequestBody Experiencia experiencia) {
+        System.out.println(experiencia.getDestino());
+        System.out.println(experiencia.getUsuario());
+        if (experiencia.getDestino() == null || experiencia.getUsuario() == null || experiencia.getCalificacion() == null || experiencia.getComentario() == null || experiencia.getFecha() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
         try {
-            // Validaciones de destino y usuario
-            if (experiencia.getDestino() == null || experiencia.getDestino().getId() == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El destino no puede estar vacío.");
-            }
-            if (experiencia.getUsuario() == null || experiencia.getUsuario().getId() == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario no puede estar vacío.");
-            }
-
             Experiencia experienciaGuardada = experienciaServicio.guardarExperiencia(experiencia);
             return ResponseEntity.status(HttpStatus.CREATED).body(experienciaGuardada);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar la experiencia.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 

@@ -8,6 +8,8 @@ import org.example.proyecturitsexplor.Excepciones.ExperienciaNotFoundException;
 import org.example.proyecturitsexplor.Repositorios.ExperienciaRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 import java.util.List;
 
 /*Servicio y clase*/
@@ -29,6 +31,7 @@ public class ExperienciaServicio {
     }
     //guardar experiencia turistico
     public Experiencia guardarExperiencia(Experiencia experiencia) {
+        experiencia.setFecha(new Date());
         return experienciaRepositorio.save(experiencia);
     }
     //Obtener experiencia por id
