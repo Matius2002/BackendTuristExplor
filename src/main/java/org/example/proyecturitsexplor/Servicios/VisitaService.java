@@ -16,9 +16,13 @@ import org.springframework.stereotype.Service;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
+import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
@@ -29,9 +33,10 @@ import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
-
 import java.io.IOException;
 import java.util.List;
+import com.itextpdf.kernel.events.IEventHandler;
+import com.itextpdf.kernel.events.Event;
 
 @Service
 public class VisitaService {
@@ -53,7 +58,7 @@ public class VisitaService {
         return visitaRepositorio.contarVisitasPorRuta();
     }
 
-    //***Método para generar el archivo Excel***
+    // ***Método para generar el archivo Excel***
     public void generarReporteExcel(List<Visita> visitas, HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Visitas");
@@ -80,7 +85,6 @@ public class VisitaService {
         workbook.close();
     }
 
-    //***Método para generar el archivo PDF***
     public void generarReportePDF(List<Visita> visitas, HttpServletResponse response) throws IOException {
         // Configuración de la respuesta HTTP para descargar el archivo PDF
         response.setContentType("application/pdf");
@@ -91,12 +95,15 @@ public class VisitaService {
         PdfDocument pdfDoc = new PdfDocument(pdfWriter);
         Document document = new Document(pdfDoc);
 
+        // Añadir el manejador de eventos para la paginación
+        pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, new PaginationHandler(document));
+
         // Tabla para organizar el logo y el título en la misma línea
         Table headerTable = new Table(new float[] { 1, 2 }); // Dos columnas: 1 para el logo y 1 para el título
         headerTable.setWidth(UnitValue.createPercentValue(100)); // Ocupa el 100% del ancho
 
         // Logo
-        String logoPath = "src/main/images/simboloalcaldia.png"; // Asegúrate de cambiar esta ruta
+        String logoPath = "src/main/images/escudo_alcaldia.jpeg"; // Asegúrate de cambiar esta ruta
         Image logo = new Image(ImageDataFactory.create(logoPath)).setWidth(60)
                 .setHorizontalAlignment(HorizontalAlignment.LEFT);
         Cell logoCell = new Cell().add(logo).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT)
@@ -104,7 +111,7 @@ public class VisitaService {
         headerTable.addCell(logoCell);
 
         // Título centrado en la segunda columna
-        Paragraph title = new Paragraph("Reporte de los tipos de turismos mas visitados")
+        Paragraph title = new Paragraph("Reporte de los tipos de turismos más visitados")
                 .setFont(PdfFontFactory.createFont("Helvetica-Bold"))
                 .setFontSize(20)
                 .setBold()
@@ -122,7 +129,7 @@ public class VisitaService {
 
         // Añadir la leyenda o descripción del reporte
         Paragraph legend = new Paragraph(
-                "Este reporte detalla sobre los tipos de turismos mas visitados registradas en el sistema, mostrando información clave como la ruta visitada y la fecha de la visita.")
+                "Este reporte detalla los tipos de turismos más visitados registrados en el sistema, mostrando información clave como la ruta visitada y la fecha de la visita.")
                 .setFontSize(12)
                 .setTextAlignment(TextAlignment.LEFT)
                 .setMarginTop(10)
@@ -162,5 +169,38 @@ public class VisitaService {
 
         // Cerrar el documento
         document.close();
-    }       
+    }
+
+    // Clase para manejar la numeración de páginas
+    class PaginationHandler implements IEventHandler {
+        protected Document document;
+
+        public PaginationHandler(Document document) {
+            this.document = document;
+        }
+
+        @Override
+        public void handleEvent(Event event) {
+            PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
+            PdfDocument pdfDoc = docEvent.getDocument();
+            PdfPage page = docEvent.getPage();
+
+            int pageNumber = pdfDoc.getPageNumber(page);
+            int totalPages = pdfDoc.getNumberOfPages();
+
+            // Texto con la numeración de páginas
+            String pageStr = String.format("Página %d de %d", pageNumber, totalPages);
+            Paragraph pageParagraph = new Paragraph(pageStr)
+                    .setFontSize(10)
+                    .setTextAlignment(TextAlignment.RIGHT);
+
+            // Definir posición para la numeración de páginas
+            float x = page.getPageSize().getWidth() - document.getRightMargin();
+            float y = document.getBottomMargin() / 2;
+
+            // Añadir la numeración de páginas en el pie de página
+            Canvas canvas = new Canvas(new PdfCanvas(page), page.getPageSize());
+            canvas.showTextAligned(pageParagraph, x, y, TextAlignment.RIGHT);
+        }
+    }
 }
