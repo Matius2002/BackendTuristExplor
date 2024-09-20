@@ -149,11 +149,16 @@ public class ReporteService {
         try (ServletOutputStream outputStream = response.getOutputStream()) {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setHeader("Content-Disposition", "attachment; filename=usuarios.xlsx");
+            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+            response.setHeader("Pragma", "no-cache");
+            response.setDateHeader("Expires", 0);
             workbook.write(outputStream);
             workbook.close();
         } catch (IOException e) {
             logger.error("Error al exportar usuarios a Excel", e);
             throw e;
+        } finally {
+            workbook.close();
         }
     }
 
