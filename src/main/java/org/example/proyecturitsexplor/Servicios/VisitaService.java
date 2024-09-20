@@ -13,7 +13,6 @@ import org.example.proyecturitsexplor.Entidades.Visita;
 import org.example.proyecturitsexplor.Repositorios.VisitaRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
@@ -44,7 +43,17 @@ public class VisitaService {
         return visitaRepositorio.findAll(); // Este método recupera todas las visitas desde el repositorio
     }
 
-    // Método para generar el archivo Excel
+    // Método para registrar una nueva visita
+    public void registrarVisita(Visita visita) {
+        visitaRepositorio.save(visita);
+    }
+
+    // Método para generar el reporte de los tipos de turismo más visitados
+    public List<Object[]> obtenerReporteVisitasPorRuta() {
+        return visitaRepositorio.contarVisitasPorRuta();
+    }
+
+    //***Método para generar el archivo Excel***
     public void generarReporteExcel(List<Visita> visitas, HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Visitas");
@@ -71,7 +80,7 @@ public class VisitaService {
         workbook.close();
     }
 
-    // Método para generar el archivo PDF
+    //***Método para generar el archivo PDF***
     public void generarReportePDF(List<Visita> visitas, HttpServletResponse response) throws IOException {
         // Configuración de la respuesta HTTP para descargar el archivo PDF
         response.setContentType("application/pdf");
@@ -95,7 +104,7 @@ public class VisitaService {
         headerTable.addCell(logoCell);
 
         // Título centrado en la segunda columna
-        Paragraph title = new Paragraph("Reporte de Visitas Registradas")
+        Paragraph title = new Paragraph("Reporte de los tipos de turismos mas visitados")
                 .setFont(PdfFontFactory.createFont("Helvetica-Bold"))
                 .setFontSize(20)
                 .setBold()
@@ -113,7 +122,7 @@ public class VisitaService {
 
         // Añadir la leyenda o descripción del reporte
         Paragraph legend = new Paragraph(
-                "Este reporte detalla las visitas registradas en el sistema, mostrando información clave como la ruta visitada y la fecha de la visita.")
+                "Este reporte detalla sobre los tipos de turismos mas visitados registradas en el sistema, mostrando información clave como la ruta visitada y la fecha de la visita.")
                 .setFontSize(12)
                 .setTextAlignment(TextAlignment.LEFT)
                 .setMarginTop(10)
