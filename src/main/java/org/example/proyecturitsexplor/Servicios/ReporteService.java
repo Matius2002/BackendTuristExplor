@@ -66,10 +66,10 @@ public class ReporteService {
     /* Método de reporte de usuarios Excel */
     public void exportarUsuariosExcel(HttpServletResponse response) throws IOException {
         List<Usuarios> usuarios = userRepositorio.findAll();
-
+    
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Usuarios");
-
+    
         // Estilos personalizados
         CellStyle headerStyle = workbook.createCellStyle();
         Font headerFont = workbook.createFont();
@@ -82,13 +82,13 @@ public class ReporteService {
         headerStyle.setBorderTop(BorderStyle.THIN);
         headerStyle.setBorderRight(BorderStyle.THIN);
         headerStyle.setBorderLeft(BorderStyle.THIN);
-
+    
         CellStyle dataStyle = workbook.createCellStyle();
         dataStyle.setBorderBottom(BorderStyle.THIN);
         dataStyle.setBorderTop(BorderStyle.THIN);
         dataStyle.setBorderRight(BorderStyle.THIN);
         dataStyle.setBorderLeft(BorderStyle.THIN);
-
+    
         CellStyle dateStyle = workbook.createCellStyle();
         CreationHelper creationHelper = workbook.getCreationHelper();
         dateStyle.setDataFormat(creationHelper.createDataFormat().getFormat("dd-MM-yyyy"));
@@ -96,73 +96,72 @@ public class ReporteService {
         dateStyle.setBorderTop(BorderStyle.THIN);
         dateStyle.setBorderRight(BorderStyle.THIN);
         dateStyle.setBorderLeft(BorderStyle.THIN);
-
+    
         // Título del documento
         Row titleRow = sheet.createRow(0);
-        Cell titleCell = (Cell) titleRow.createCell(0);
-        ((org.apache.poi.ss.usermodel.Cell) titleCell).setCellValue("Reporte de Usuarios Registrados");
+        org.apache.poi.ss.usermodel.Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue("Reporte de Usuarios Registrados");
         Font titleFont = workbook.createFont();
         titleFont.setBold(true);
         titleFont.setFontHeightInPoints((short) 16);
         CellStyle titleStyle = workbook.createCellStyle();
         titleStyle.setFont(titleFont);
-        ((org.apache.poi.ss.usermodel.Cell) titleCell).setCellStyle(titleStyle);
+        titleCell.setCellStyle(titleStyle);
         sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 3)); // Unir las celdas para el título
-
+    
         // Crear encabezado de la tabla
         Row header = sheet.createRow(2);
         String[] columnHeaders = { "ID", "Nombre de Usuario", "Email", "Fecha de Registro" };
         for (int i = 0; i < columnHeaders.length; i++) {
-            Cell cell = (Cell) header.createCell(i);
-            ((org.apache.poi.ss.usermodel.Cell) cell).setCellValue(columnHeaders[i]);
-            ((org.apache.poi.ss.usermodel.Cell) cell).setCellStyle(headerStyle);
+            org.apache.poi.ss.usermodel.Cell cell = header.createCell(i);
+            cell.setCellValue(columnHeaders[i]);
+            cell.setCellStyle(headerStyle);
         }
-
+    
         // Añadir datos de los usuarios
         int rowIdx = 3; // La primera fila de datos después del encabezado
         for (Usuarios usuario : usuarios) {
             Row row = sheet.createRow(rowIdx++);
-
-            Cell idCell = (Cell) row.createCell(0);
-            ((org.apache.poi.ss.usermodel.Cell) idCell).setCellValue(usuario.getId());
-            ((org.apache.poi.ss.usermodel.Cell) idCell).setCellStyle(dataStyle);
-
-            Cell nameCell = (Cell) row.createCell(1);
-            ((org.apache.poi.ss.usermodel.Cell) nameCell).setCellValue(usuario.getNombreUsuario());
-            ((org.apache.poi.ss.usermodel.Cell) nameCell).setCellStyle(dataStyle);
-
-            Cell emailCell = (Cell) row.createCell(2);
-            ((org.apache.poi.ss.usermodel.Cell) emailCell).setCellValue(usuario.getEmail());
-            ((org.apache.poi.ss.usermodel.Cell) emailCell).setCellStyle(dataStyle);
-
-            Cell dateCell = (Cell) row.createCell(3);
-            ((org.apache.poi.ss.usermodel.Cell) dateCell).setCellValue(usuario.getFechaRegistro());
-            ((org.apache.poi.ss.usermodel.Cell) dateCell).setCellStyle(dateStyle);
+    
+            org.apache.poi.ss.usermodel.Cell idCell = row.createCell(0);
+            idCell.setCellValue(usuario.getId());
+            idCell.setCellStyle(dataStyle);
+    
+            org.apache.poi.ss.usermodel.Cell nameCell = row.createCell(1);
+            nameCell.setCellValue(usuario.getNombreUsuario());
+            nameCell.setCellStyle(dataStyle);
+    
+            org.apache.poi.ss.usermodel.Cell emailCell = row.createCell(2);
+            emailCell.setCellValue(usuario.getEmail());
+            emailCell.setCellStyle(dataStyle);
+    
+            org.apache.poi.ss.usermodel.Cell dateCell = row.createCell(3);
+            if (usuario.getFechaRegistro() != null) {
+                dateCell.setCellValue(usuario.getFechaRegistro());
+                dateCell.setCellStyle(dateStyle);
+            }
         }
-
+    
         // Autoajustar el tamaño de las columnas
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < columnHeaders.length; i++) {
             sheet.autoSizeColumn(i);
         }
-
+    
         // Descargar el archivo
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=usuarios.xlsx");
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+    
         try (ServletOutputStream outputStream = response.getOutputStream()) {
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setHeader("Content-Disposition", "attachment; filename=usuarios.xlsx");
-            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            response.setHeader("Pragma", "no-cache");
-            response.setDateHeader("Expires", 0);
             workbook.write(outputStream);
-            workbook.close();
-        } catch (IOException e) {
-            logger.error("Error al exportar usuarios a Excel", e);
-            throw e;
         } finally {
             workbook.close();
         }
-    }
+    }        
 
-    // Método de reporte de usuarios en PDF
+    //REPORTE USUARIOS PDF
     public ByteArrayInputStream exportarUsuariosPDF() {
         List<Usuarios> usuarios = userRepositorio.findAll();
 
@@ -251,7 +250,7 @@ public class ReporteService {
             logger.error("Error al generar reporte en PDF de usuarios", e);
             return new ByteArrayInputStream(new byte[0]);
         }
-    } // Fin del reporte de usuarios en PDF
+    } //FIN USUARIOS PDF
 
     // Clase para manejar la numeración de páginas
     class PaginationHandler implements IEventHandler {
@@ -296,7 +295,7 @@ public class ReporteService {
         }
     }
 
-    // Método para comentarios en Excel
+    // REPORTE COMENTARIOS EXCEL
     public ByteArrayInputStream generarReporteComentariosExcel() {
         List<Experiencia> experiencias = experienciaRepositorio.findAll();
 
@@ -330,9 +329,9 @@ public class ReporteService {
             logger.error("Error al generar el reporte de comentarios en Excel", e);
             return new ByteArrayInputStream(new byte[0]);
         }
-    } // Fin del reporte de comentarios en Excel
+    } //FIN COMENTARIOS EXCEL
 
-    // Reporte de comentarios en PDF
+    // REPORTE COMENTARIOS PDF
     public ByteArrayInputStream generarReporteComentariosPDF() {
         List<Experiencia> experiencias = experienciaRepositorio.findAll();
 
@@ -341,10 +340,8 @@ public class ReporteService {
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
 
-            // Crear un evento de paginación
             pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, new PaginationHandler(document));
 
-            // Encabezado con logo y título
             Table headerTable = new Table(new float[] { 1, 4 });
             headerTable.setWidth(UnitValue.createPercentValue(100));
 
@@ -365,7 +362,6 @@ public class ReporteService {
             document.add(headerTable);
             document.add(new Paragraph(" "));
 
-            // Leyenda del reporte
             Paragraph legend = new Paragraph(
                     "Este reporte detalla los comentarios y calificaciones realizados por los usuarios sobre sus experiencias en los diferentes destinos.")
                     .setFontSize(12)
@@ -376,7 +372,6 @@ public class ReporteService {
 
             document.add(new Paragraph(" "));
 
-            // Tabla para mostrar los datos de las experiencias
             Table table = new Table(new float[] { 1, 3, 2, 1, 5, 2 });
             table.setWidth(UnitValue.createPercentValue(100));
             table.addHeaderCell(new Cell().add(new Paragraph("ID").setBold()));
@@ -401,7 +396,6 @@ public class ReporteService {
 
             document.add(table);
 
-            // Pie de página con la fecha
             Paragraph footer = new Paragraph("Reporte generado el: " + java.time.LocalDate.now())
                     .setFontSize(10)
                     .setTextAlignment(TextAlignment.RIGHT)
@@ -415,5 +409,5 @@ public class ReporteService {
             logger.error("Error al generar el reporte de comentarios en PDF", e);
             return new ByteArrayInputStream(new byte[0]);
         }
-    }// Fin del reporte de comentarios en PDF
+    } // FIN COMENTARIOS PDF
 }
