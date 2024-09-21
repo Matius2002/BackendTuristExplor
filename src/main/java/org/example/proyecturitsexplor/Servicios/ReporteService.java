@@ -377,55 +377,76 @@ public class ReporteService {
     // Reporte de comentarios en PDF
     public ByteArrayInputStream generarReporteComentariosPDF() {
         List<Experiencia> experiencias = experienciaRepositorio.findAll();
-    
+
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             PdfWriter writer = new PdfWriter(out);
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
-    
+
             pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, new PaginationHandler(document));
-    
+
             Table headerTable = new Table(new float[] { 1, 4 });
             headerTable.setWidth(UnitValue.createPercentValue(100));
-    
+
+            // Logo
             String logoPath = "src/main/images/escudo_alcaldia.jpeg";
             Image logo = new Image(ImageDataFactory.create(logoPath)).setWidth(60)
                     .setHorizontalAlignment(HorizontalAlignment.LEFT);
-            Cell logoCell = new Cell().add(logo).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT)
+            Cell logoCell = new Cell().add(logo).setBorder(Border.NO_BORDER)
+                    .setTextAlignment(TextAlignment.LEFT)
                     .setVerticalAlignment(VerticalAlignment.MIDDLE);
             headerTable.addCell(logoCell);
-    
+
+            // Agregar el logo al documento
+            document.add(headerTable);
+
+            // Crear una nueva tabla solo para el título
+            Table titleTable = new Table(1);
+            titleTable.setWidth(UnitValue.createPercentValue(100));
+
+            // Título del reporte
             Paragraph title = new Paragraph("Reporte de Comentarios")
                     .setFont(PdfFontFactory.createFont("Helvetica-Bold")).setFontSize(20).setBold()
                     .setFontColor(new DeviceRgb(0, 102, 204)).setTextAlignment(TextAlignment.CENTER);
-            Cell titleCell = new Cell().add(title).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.CENTER)
+            Cell titleCell = new Cell().add(title).setBorder(Border.NO_BORDER)
+                    .setTextAlignment(TextAlignment.CENTER)
                     .setVerticalAlignment(VerticalAlignment.MIDDLE);
-            headerTable.addCell(titleCell);
-    
-            document.add(headerTable);
+            titleTable.addCell(titleCell);
+
+            // Agregar la tabla del título al documento
+            document.add(titleTable);
+
+            // Espacio después del título
             document.add(new Paragraph(" "));
-    
+
+            // Leyenda del reporte
             Paragraph legend = new Paragraph(
                     "Este reporte detalla los comentarios y calificaciones realizados por los usuarios sobre sus experiencias en los diferentes destinos.")
                     .setFontSize(12)
-                    .setTextAlignment(TextAlignment.LEFT) // Centrado
+                    .setTextAlignment(TextAlignment.LEFT)
                     .setMarginTop(10)
                     .setFontColor(ColorConstants.DARK_GRAY);
             document.add(legend);
-    
-            document.add(new Paragraph(" "));
-    
+
+            document.add(new Paragraph(" ")); // Espacio adicional
+
+            // Tabla de datos
             Table table = new Table(new float[] { 1, 3, 2, 1, 5, 2 });
             table.setWidth(UnitValue.createPercentValue(100));
-            
+
             // Alineación centrada para los encabezados
             table.addHeaderCell(new Cell().add(new Paragraph("ID").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Destino").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Usuario").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Calificación").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Comentario").setBold()).setTextAlignment(TextAlignment.CENTER));
-            table.addHeaderCell(new Cell().add(new Paragraph("Fecha").setBold()).setTextAlignment(TextAlignment.CENTER));
-    
+            table.addHeaderCell(
+                    new Cell().add(new Paragraph("Destino").setBold()).setTextAlignment(TextAlignment.CENTER));
+            table.addHeaderCell(
+                    new Cell().add(new Paragraph("Usuario").setBold()).setTextAlignment(TextAlignment.CENTER));
+            table.addHeaderCell(
+                    new Cell().add(new Paragraph("Calificación").setBold()).setTextAlignment(TextAlignment.CENTER));
+            table.addHeaderCell(
+                    new Cell().add(new Paragraph("Comentario").setBold()).setTextAlignment(TextAlignment.CENTER));
+            table.addHeaderCell(
+                    new Cell().add(new Paragraph("Fecha").setBold()).setTextAlignment(TextAlignment.CENTER));
+
             // Agregar contenido centrado
             for (Experiencia experiencia : experiencias) {
                 table.addCell(new Cell().add(new Paragraph(String.valueOf(experiencia.getId())))
@@ -445,16 +466,16 @@ public class ReporteService {
                         experiencia.getFecha() != null ? experiencia.getFecha().toString() : "Fecha desconocida"))
                         .setTextAlignment(TextAlignment.CENTER));
             }
-    
+
             document.add(table);
-    
+
             Paragraph footer = new Paragraph("Reporte generado el: " + java.time.LocalDate.now())
                     .setFontSize(10)
                     .setTextAlignment(TextAlignment.RIGHT)
                     .setMarginTop(30)
                     .setFontColor(ColorConstants.GRAY);
             document.add(footer);
-    
+
             document.close();
             return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
