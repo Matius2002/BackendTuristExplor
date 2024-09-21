@@ -5,9 +5,17 @@ package org.example.proyecturitsexplor.Servicios; /*Paquete*/
 
 /*Importaciones*/
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.proyecturitsexplor.Entidades.Visita;
 import org.example.proyecturitsexplor.Repositorios.VisitaRepositorio;
@@ -62,28 +70,91 @@ public class VisitaService {
     public void generarReporteExcel(List<Visita> visitas, HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Visitas");
-
+    
+        // Estilos personalizados
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setFontHeightInPoints((short) 12);
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setBorderBottom(BorderStyle.THIN);
+        headerStyle.setBorderTop(BorderStyle.THIN);
+        headerStyle.setBorderRight(BorderStyle.THIN);
+        headerStyle.setBorderLeft(BorderStyle.THIN);
+    
+        CellStyle dataStyle = workbook.createCellStyle();
+        dataStyle.setBorderBottom(BorderStyle.THIN);
+        dataStyle.setBorderTop(BorderStyle.THIN);
+        dataStyle.setBorderRight(BorderStyle.THIN);
+        dataStyle.setBorderLeft(BorderStyle.THIN);
+    
+        CellStyle dateStyle = workbook.createCellStyle();
+        CreationHelper creationHelper = workbook.getCreationHelper();
+        dateStyle.setDataFormat(creationHelper.createDataFormat().getFormat("dd-MM-yyyy HH:mm"));
+        dateStyle.setBorderBottom(BorderStyle.THIN);
+        dateStyle.setBorderTop(BorderStyle.THIN);
+        dateStyle.setBorderRight(BorderStyle.THIN);
+        dateStyle.setBorderLeft(BorderStyle.THIN);
+    
+        // Crear título
+        Row titleRow = sheet.createRow(0);
+        org.apache.poi.ss.usermodel.Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue("Los Tipos de Turismos Más Visitados");
+        Font titleFont = workbook.createFont();
+        titleFont.setBold(true);
+        titleFont.setFontHeightInPoints((short) 16);
+        CellStyle titleStyle = workbook.createCellStyle();
+        titleStyle.setFont(titleFont);
+        titleCell.setCellStyle(titleStyle);
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 2)); // Unir celdas para el título
+    
+        // Leyenda del reporte
+        Row legendRow = sheet.createRow(1);
+        org.apache.poi.ss.usermodel.Cell legendCell = legendRow.createCell(0);
+        legendCell.setCellValue("Este reporte detalla los tipos de turismos más visitados, mostrando información clave como la ruta visitada y la fecha y hora de la visita.");
+        CellStyle legendStyle = workbook.createCellStyle();
+        legendStyle.setWrapText(true); // Permitir ajuste de texto
+        legendCell.setCellStyle(legendStyle);
+        sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 2)); // Unir celdas para la leyenda
+    
+        // Fila en blanco para dar espacio entre la leyenda y la tabla
+        Row emptyRow = sheet.createRow(2); // Fila vacía para espacio
+        emptyRow.createCell(0).setCellValue(""); // Solo se necesita para crear la fila
+    
         // Crear encabezados
-        Row headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("ID");
-        headerRow.createCell(1).setCellValue("Ruta Visitada");
-        headerRow.createCell(2).setCellValue("Fecha y Hora de Visita");
-
+        Row headerRow = sheet.createRow(3);
+        String[] columnHeaders = { "ID", "Ruta Visitada", "Fecha y Hora de Visita" };
+        for (int i = 0; i < columnHeaders.length; i++) {
+            org.apache.poi.ss.usermodel.Cell cell = headerRow.createCell(i);
+            cell.setCellValue(columnHeaders[i]);
+            cell.setCellStyle(headerStyle);
+        }
+    
         // Rellenar filas con los datos de las visitas
-        int rowNum = 1;
+        int rowNum = 4;
         for (Visita visita : visitas) {
             Row row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue(visita.getId());
             row.createCell(1).setCellValue(visita.getRutaVisitada());
-            row.createCell(2).setCellValue(visita.getFechaHoraVisita().toString());
+    
+            org.apache.poi.ss.usermodel.Cell fechaHoraCell = row.createCell(2);
+            fechaHoraCell.setCellValue(visita.getFechaHoraVisita());
+            fechaHoraCell.setCellStyle(dateStyle);
         }
-
+    
+        // Autoajustar el tamaño de las columnas
+        for (int i = 0; i < columnHeaders.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+    
         // Configuración de la respuesta HTTP para descargar el archivo Excel
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=visitas.xlsx");
         workbook.write(response.getOutputStream());
         workbook.close();
-    }
+    }    
 
     public void generarReportePDF(List<Visita> visitas, HttpServletResponse response) throws IOException {
         // Configuración de la respuesta HTTP para descargar el archivo PDF

@@ -4,7 +4,7 @@ public class ExperienciaNotFoundException extends RuntimeException{
     private Long id;
 
     public ExperienciaNotFoundException(Long id) {
-        super("No se pudo encontrar la experiencia con el ID: " + id);
+        super("Experiencia no encontrado: " + id);
         this.id = id;
 
     }

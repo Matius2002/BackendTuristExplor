@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.example.proyecturitsexplor.Servicios.ReporteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -32,10 +33,10 @@ public class ReporteController {
 
             reporteService.exportarUsuariosExcel(response);
         } catch (IOException e) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error generando reporte de usuarios en Excel");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Error generando reporte de usuarios en Excel");
         }
     }
-
 
     @GetMapping("/reportes/usuarios/pdf")
     public ResponseEntity<byte[]> generarReporteUsuariosPDF() {
@@ -47,6 +48,7 @@ public class ReporteController {
         return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(bis.readAllBytes());
     }
 
+    
     @GetMapping("/reportes/comentarios/{format}")
     public ResponseEntity<Resource> generarReporteComentarios(@PathVariable String format) {
         String filename = "reporte_comentarios." + format;
