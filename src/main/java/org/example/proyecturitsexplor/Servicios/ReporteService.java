@@ -287,7 +287,7 @@ public class ReporteService {
                     .setMarginTop(30)
                     .setFontColor(ColorConstants.GRAY);
             document.add(footer);
-            document.close();
+             document.close();
             return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
             logger.error("Error al generar reporte en PDF de usuarios", e);
@@ -295,7 +295,7 @@ public class ReporteService {
         }
     } // FIN USUARIOS PDF
 
-    //Números de paginas y pie de pagina especifico
+   //Números de paginas y pie de pagina especifico
     class PaginationHandler implements IEventHandler {
         protected Document document;
     
@@ -320,7 +320,7 @@ public class ReporteService {
     
             // Definir posición para la numeración de páginas
             float xPage = page.getPageSize().getWidth() - document.getRightMargin();
-            float yPage = document.getBottomMargin() / 2;
+            float yPage = page.getPageSize().getHeight() - document.getTopMargin() + 10;
     
             // Añadir la numeración de páginas en el pie de página
             Canvas canvas = new Canvas(new PdfCanvas(page), page.getPageSize());
@@ -405,7 +405,7 @@ public class ReporteService {
 
             // Logo
             String logoPath = "src/main/images/escudo_alcaldia.jpeg";
-            Image logo = new Image(ImageDataFactory.create(logoPath)).setWidth(60)
+            Image logo = new Image(ImageDataFactory.create(logoPath)).setWidth(80)
                     .setHorizontalAlignment(HorizontalAlignment.LEFT);
             Cell logoCell = new Cell().add(logo).setBorder(Border.NO_BORDER)
                     .setTextAlignment(TextAlignment.LEFT)
@@ -436,7 +436,7 @@ public class ReporteService {
 
             // Leyenda del reporte
             Paragraph legend = new Paragraph(
-                    "Reporte de comentarios registrados en el sistema (nueva-experiencia). Con Destino, Usuario, Calificación, Comentario y Fecha. Esto con el fin de poder saber que es lo que piensan los turistas y locales que visitan nueatras zonas que hacen parte del turismo del municipio de Girardot, Cundinamarca.")
+                    "Reporte de comentarios registrados en el sistema (nueva-experiencia). Con Destino, Usuario, Calificación, Comentario y Fecha. Esto con el fin de poder saber que es lo que piensan los turistas y locales que visitan nuestras zonas que hacen parte del turismo del municipio de Girardot, Cundinamarca.")
                     .setFontSize(12)
                     .setTextAlignment(TextAlignment.JUSTIFIED)
                     .setMarginTop(10)
