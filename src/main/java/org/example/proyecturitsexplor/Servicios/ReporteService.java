@@ -295,36 +295,49 @@ public class ReporteService {
         }
     } // FIN USUARIOS PDF
 
-    // Clase para manejar la numeración de páginas
+    //Números de paginas y pie de pagina especifico
     class PaginationHandler implements IEventHandler {
         protected Document document;
-
+    
         public PaginationHandler(Document document) {
             this.document = document;
         }
-
+    
         @Override
         public void handleEvent(Event event) {
             PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
             PdfDocument pdfDoc = docEvent.getDocument();
             PdfPage page = docEvent.getPage();
-
+    
             int pageNumber = pdfDoc.getPageNumber(page);
             int totalPages = pdfDoc.getNumberOfPages();
-
+    
             // Texto con la numeración de páginas
             String pageStr = String.format("Página %d de %d", pageNumber, totalPages);
             Paragraph pageParagraph = new Paragraph(pageStr)
                     .setFontSize(10)
                     .setTextAlignment(TextAlignment.RIGHT);
-
+    
             // Definir posición para la numeración de páginas
-            float x = page.getPageSize().getWidth() - document.getRightMargin();
-            float y = document.getBottomMargin() / 2;
-
+            float xPage = page.getPageSize().getWidth() - document.getRightMargin();
+            float yPage = document.getBottomMargin() / 2;
+    
             // Añadir la numeración de páginas en el pie de página
             Canvas canvas = new Canvas(new PdfCanvas(page), page.getPageSize());
-            canvas.showTextAligned(pageParagraph, x, y, TextAlignment.RIGHT);
+            canvas.showTextAligned(pageParagraph, xPage, yPage, TextAlignment.RIGHT);
+    
+            // Texto del pie de página
+            String footerText = "Instituto Municipal de Turismo Cultura y Fomento";
+            Paragraph footerParagraph = new Paragraph(footerText)
+                    .setFontSize(10)
+                    .setTextAlignment(TextAlignment.LEFT);
+    
+            // Definir posición para el pie de página
+            float xFooter = document.getLeftMargin();
+            float yFooter = document.getBottomMargin() / 2;
+    
+            // Añadir el pie de página
+            canvas.showTextAligned(footerParagraph, xFooter, yFooter, TextAlignment.LEFT);
         }
     }
 
@@ -383,6 +396,8 @@ public class ReporteService {
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
 
+            // Agregar el manejador de paginación
+            PaginationHandler paginationHandler = new PaginationHandler(document);
             pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, new PaginationHandler(document));
 
             Table headerTable = new Table(new float[] { 1, 4 });
@@ -421,9 +436,9 @@ public class ReporteService {
 
             // Leyenda del reporte
             Paragraph legend = new Paragraph(
-                    "Este reporte detalla los comentarios y calificaciones realizados por los usuarios sobre sus experiencias en los diferentes destinos.")
+                    "Reporte de comentarios registrados en el sistema (nueva-experiencia). Con Destino, Usuario, Calificación, Comentario y Fecha. Esto con el fin de poder saber que es lo que piensan los turistas y locales que visitan nueatras zonas que hacen parte del turismo del municipio de Girardot, Cundinamarca.")
                     .setFontSize(12)
-                    .setTextAlignment(TextAlignment.LEFT)
+                    .setTextAlignment(TextAlignment.JUSTIFIED)
                     .setMarginTop(10)
                     .setFontColor(ColorConstants.DARK_GRAY);
             document.add(legend);
