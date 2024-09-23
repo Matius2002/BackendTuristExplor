@@ -9,8 +9,9 @@ public class Visita {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String rutaVisitada;
+    private String tipoTurismo;
     private LocalDateTime fechaHoraVisita;
+    private String usuario;
 
     // Getters y Setters
     public Long getId() {
@@ -21,12 +22,12 @@ public class Visita {
         this.id = id;
     }
 
-    public String getRutaVisitada() {
-        return rutaVisitada;
+    public String getTipoTurismo() {
+        return tipoTurismo;
     }
 
-    public void setRutaVisitada(String rutaVisitada) {
-        this.rutaVisitada = rutaVisitada;
+    public void setTipoTurismo(String rutaVisitada) {
+        this.tipoTurismo = rutaVisitada;
     }
 
     public LocalDateTime getFechaHoraVisita() {
@@ -35,6 +36,14 @@ public class Visita {
 
     public void setFechaHoraVisita(LocalDateTime fechaHoraVisita) {
         this.fechaHoraVisita = fechaHoraVisita;
+    }
+
+    public String getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
     }
 }
 
