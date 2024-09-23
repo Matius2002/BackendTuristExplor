@@ -11,7 +11,6 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.itextpdf.kernel.pdf.canvas.parser.clipper.Paths;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
@@ -24,13 +23,10 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.poi.ss.formula.functions.Index;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.ClientAnchor;
-import org.apache.poi.ss.usermodel.ClientAnchor.AnchorType;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -42,7 +38,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.xmlbeans.impl.xb.ltgfmt.TestCase.Files;
 import org.example.proyecturitsexplor.Entidades.Experiencia;
 import org.example.proyecturitsexplor.Entidades.Usuarios;
 import org.example.proyecturitsexplor.Repositorios.ExperienciaRepositorio;
@@ -58,7 +53,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.io.FileInputStream;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
-//import com.itextpdf.layout.properties.HorizontalAlignment;  // iTextPDF
+//import com.itextpdf.layout.properties.HorizontalAlignment;  
 
 @Service
 public class ReporteService {
@@ -147,17 +142,17 @@ public class ReporteService {
         sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 3));
 
         // Leyenda explicativa
-        Row legendRow = sheet.createRow(4);
+        Row legendRow = sheet.createRow(2);
         org.apache.poi.ss.usermodel.Cell legendCell = legendRow.createCell(0);
         legendCell.setCellValue(
                 "Este reporte detalla los usuarios registrados en el sistema, mostrando información clave como el nombre de usuario, el correo electrónico y la fecha de registro.");
         CellStyle legendStyle = workbook.createCellStyle();
         legendStyle.setWrapText(true);
         legendCell.setCellStyle(legendStyle);
-        sheet.addMergedRegion(new CellRangeAddress(4, 4, 0, 3));
+        sheet.addMergedRegion(new CellRangeAddress(2, 2, 0, 3));
 
         // Encabezados de la tabla
-        Row header = sheet.createRow(6);
+        Row header = sheet.createRow(4);
         String[] columnHeaders = { "ID", "Nombre de Usuario", "Email", "Fecha de Registro" };
         for (int i = 0; i < columnHeaders.length; i++) {
             org.apache.poi.ss.usermodel.Cell cell = header.createCell(i);
@@ -166,7 +161,7 @@ public class ReporteService {
         }
 
         // Rellenar los datos
-        int rowIdx = 7;
+        int rowIdx = 5;
         for (Usuarios usuario : usuarios) {
             Row row = sheet.createRow(rowIdx++);
 
