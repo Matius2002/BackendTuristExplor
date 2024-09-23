@@ -1,6 +1,4 @@
-/*Objetivo: Cuyo objetivo es generar y exportar reportes en diferentes formatos (PDF y Excel) basados en datos de usuarios 
-y experiencias almacenados en la base de datos.*/
-package org.example.proyecturitsexplor.Servicios; /*Paquete*/
+package org.example.proyecturitsexplor.Servicios; 
 
 import com.itextpdf.kernel.events.IEventHandler;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -26,8 +24,6 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.apache.commons.compress.utils.IOUtils;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.ClientAnchor;
@@ -36,7 +32,6 @@ import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -52,15 +47,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /*Servicio y clase*/
 @Service
@@ -80,13 +69,6 @@ public class ReporteService {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Usuarios");
 
-        // Cargar el logo (imagen en formato byte[] de la ruta)
-        // InputStream logoStream = new
-        // FileInputStream("src/main/images/escudo_alcaldia.jpeg");
-        // byte[] logoBytes = IOUtils.toByteArray(logoStream);
-        // int pictureIdx = workbook.addPicture(logoBytes, Workbook.PICTURE_TYPE_PNG);
-        // logoStream.close();
-
         // Crear un helper de dibujo para agregar el logo
         Drawing<?> drawing = sheet.createDrawingPatriarch();
         ClientAnchor anchor = workbook.getCreationHelper().createClientAnchor();
@@ -94,10 +76,6 @@ public class ReporteService {
         anchor.setRow1(0); // Fila inicial
         anchor.setCol2(3); // Columna final (ajustando el ancho del logo)
         anchor.setRow2(2); // Fila final (ajustando la altura del logo)
-
-        // Insertar el logo en la hoja
-        // Picture pict = drawing.createPicture(anchor, pictureIdx);
-        // pict.resize(0.5); // Ajusta el tamaño del logo
 
         // Estilos personalizados
         CellStyle headerStyle = workbook.createCellStyle();
@@ -341,6 +319,16 @@ public class ReporteService {
         }
     }
 
+    public InputStream generarReporteComentarios(String format) {
+        if (format.equals("pdf")) {
+            return generarReporteComentariosPDF();
+        } else if (format.equals("excel")) {
+            return generarReporteComentariosExcel();
+        } else {
+            throw new IllegalArgumentException("Formato no soportado: " + format);
+        }
+    }
+
     // REPORTE COMENTARIOS EXCEL
     public ByteArrayInputStream generarReporteComentariosExcel() {
         List<Experiencia> experiencias = experienciaRepositorio.findAll();
@@ -377,18 +365,8 @@ public class ReporteService {
         }
     }// FIN COMENTARIOS EXCEL
 
-    public InputStream generarReporteComentarios(String format) {
-        if (format.equals("pdf")) {
-            return generarReporteComentariosPDF();
-        } else if (format.equals("excel")) {
-            return generarReporteComentariosExcel();
-        } else {
-            throw new IllegalArgumentException("Formato no soportado: " + format);
-        }
-    }
-
     // Reporte de comentarios en PDF
-    public ByteArrayInputStream generarReporteComentariosPDF() {
+public ByteArrayInputStream generarReporteComentariosPDF() {
         List<Experiencia> experiencias = experienciaRepositorio.findAll();
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -497,5 +475,5 @@ public class ReporteService {
             logger.error("Error al generar el reporte de comentarios en PDF", e);
             return new ByteArrayInputStream(new byte[0]);
         }
-    }// FIN COMENTARIOS PDF
+    }
 }
