@@ -75,13 +75,33 @@ public class ReporteService {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Usuarios");
 
-        Drawing<?> drawing = sheet.createDrawingPatriarch();
-        ClientAnchor anchor = workbook.getCreationHelper().createClientAnchor();
-        anchor.setCol1(2);
-        anchor.setRow1(0);
-        anchor.setCol2(3);
-        anchor.setRow2(2);
+        // Agregar logo
+        int logoColumnStart = 5; // Columna donde comenzará el logo
+        int logoRowStart = 0; // Fila donde comenzará el logo
+        int logoColumnEnd = 7; // Columna donde terminará el logo
+        int logoRowEnd = 7; // Fila donde terminará el logo
 
+        try (InputStream inputStreamLogo = new FileInputStream("src/main/images/escudo_alcaldia.jpeg")) {
+            byte[] logoBytes = IOUtils.toByteArray(inputStreamLogo);
+            int logoIndex = workbook.addPicture(logoBytes, Workbook.PICTURE_TYPE_JPEG);
+
+            Drawing<?> drawing = sheet.createDrawingPatriarch();
+            CreationHelper helper = workbook.getCreationHelper();
+            ClientAnchor anchor = helper.createClientAnchor();
+
+            // Posicionar la imagen
+            anchor.setCol1(logoColumnStart);
+            anchor.setRow1(logoRowStart);
+            anchor.setCol2(logoColumnEnd);
+            anchor.setRow2(logoRowEnd);
+
+            Picture pict = drawing.createPicture(anchor, logoIndex);
+            pict.resize(1); // Ajusta la escala de la imagen
+        } catch (IOException e) {
+            logger.error("Error al agregar el logo al Excel", e);
+        }
+
+        // Estilos personalizados
         CellStyle headerStyle = workbook.createCellStyle();
         Font headerFont = workbook.createFont();
         headerFont.setBold(true);
@@ -93,12 +113,14 @@ public class ReporteService {
         headerStyle.setBorderTop(BorderStyle.THIN);
         headerStyle.setBorderRight(BorderStyle.THIN);
         headerStyle.setBorderLeft(BorderStyle.THIN);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
 
         CellStyle dataStyle = workbook.createCellStyle();
         dataStyle.setBorderBottom(BorderStyle.THIN);
         dataStyle.setBorderTop(BorderStyle.THIN);
         dataStyle.setBorderRight(BorderStyle.THIN);
         dataStyle.setBorderLeft(BorderStyle.THIN);
+        dataStyle.setAlignment(HorizontalAlignment.CENTER);
 
         CellStyle dateStyle = workbook.createCellStyle();
         CreationHelper creationHelper = workbook.getCreationHelper();
@@ -107,18 +129,24 @@ public class ReporteService {
         dateStyle.setBorderTop(BorderStyle.THIN);
         dateStyle.setBorderRight(BorderStyle.THIN);
         dateStyle.setBorderLeft(BorderStyle.THIN);
+        dateStyle.setAlignment(HorizontalAlignment.CENTER);
 
-        Row titleRow = sheet.createRow(3);
+        // Título del reporte
+        Row titleRow = sheet.createRow(0);
         org.apache.poi.ss.usermodel.Cell titleCell = titleRow.createCell(0);
         titleCell.setCellValue("Reporte de Usuarios Registrados");
         Font titleFont = workbook.createFont();
         titleFont.setBold(true);
         titleFont.setFontHeightInPoints((short) 16);
         CellStyle titleStyle = workbook.createCellStyle();
+        titleStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         titleStyle.setFont(titleFont);
+        titleStyle.setAlignment(HorizontalAlignment.CENTER);
         titleCell.setCellStyle(titleStyle);
-        sheet.addMergedRegion(new CellRangeAddress(3, 3, 0, 3));
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 3));
 
+        // Leyenda explicativa
         Row legendRow = sheet.createRow(4);
         org.apache.poi.ss.usermodel.Cell legendCell = legendRow.createCell(0);
         legendCell.setCellValue(
@@ -128,9 +156,7 @@ public class ReporteService {
         legendCell.setCellStyle(legendStyle);
         sheet.addMergedRegion(new CellRangeAddress(4, 4, 0, 3));
 
-        Row emptyRow = sheet.createRow(5);
-        emptyRow.createCell(0).setCellValue("");
-
+        // Encabezados de la tabla
         Row header = sheet.createRow(6);
         String[] columnHeaders = { "ID", "Nombre de Usuario", "Email", "Fecha de Registro" };
         for (int i = 0; i < columnHeaders.length; i++) {
@@ -139,6 +165,7 @@ public class ReporteService {
             cell.setCellStyle(headerStyle);
         }
 
+        // Rellenar los datos
         int rowIdx = 7;
         for (Usuarios usuario : usuarios) {
             Row row = sheet.createRow(rowIdx++);
@@ -162,10 +189,12 @@ public class ReporteService {
             }
         }
 
+        // Ajustar el tamaño de las columnas
         for (int i = 0; i < columnHeaders.length; i++) {
             sheet.autoSizeColumn(i);
         }
 
+        // Configurar la respuesta HTTP
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=usuarios.xlsx");
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -183,70 +212,85 @@ public class ReporteService {
         List<Usuarios> usuarios = userRepositorio.findAll();
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-
             PdfWriter writer = new PdfWriter(out);
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
 
-            pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE,
-                    (com.itextpdf.kernel.events.IEventHandler) new PaginationHandler(document));
+            // Agregar manejador de paginación
+            pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, new PaginationHandler(document));
 
-            Table headerTable = new Table(new float[] { 1, 2 });
+            // Tabla del encabezado
+            Table headerTable = new Table(new float[] { 1, 4 });
             headerTable.setWidth(UnitValue.createPercentValue(100));
 
+            // Logo
             String logoPath = "src/main/images/escudo_alcaldia.jpeg";
-            Image logo = new Image(ImageDataFactory.create(logoPath)).setWidth(60)
+            Image logo = new Image(ImageDataFactory.create(logoPath)).setWidth(80)
                     .setHorizontalAlignment(com.itextpdf.layout.properties.HorizontalAlignment.LEFT);
-            Cell logoCell = new Cell().add(logo).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT)
+            Cell logoCell = new Cell().add(logo).setBorder(Border.NO_BORDER)
+                    .setTextAlignment(TextAlignment.LEFT)
                     .setVerticalAlignment(VerticalAlignment.MIDDLE);
             headerTable.addCell(logoCell);
 
+            // Título
+            Table titleTable = new Table(1);
+            titleTable.setWidth(UnitValue.createPercentValue(100));
             Paragraph title = new Paragraph("Reporte de Usuarios Registrados")
                     .setFont(PdfFontFactory.createFont("Helvetica-Bold"))
                     .setFontSize(20)
                     .setBold()
                     .setFontColor(new DeviceRgb(0, 102, 204))
                     .setTextAlignment(TextAlignment.CENTER);
-            Cell titleCell = new Cell().add(title).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.CENTER)
+            Cell titleCell = new Cell().add(title).setBorder(Border.NO_BORDER)
+                    .setTextAlignment(TextAlignment.CENTER)
                     .setVerticalAlignment(VerticalAlignment.MIDDLE);
-
-            headerTable.addCell(titleCell);
+            titleTable.addCell(titleCell);
             document.add(headerTable);
+            document.add(titleTable);
             document.add(new Paragraph(" "));
 
+            // Leyenda
             Paragraph legend = new Paragraph(
                     "Este reporte detalla los usuarios registrados en el sistema, mostrando información clave como el nombre de usuario, el correo electrónico y la fecha de registro.")
                     .setFontSize(12)
-                    .setTextAlignment(TextAlignment.LEFT)
+                    .setTextAlignment(TextAlignment.JUSTIFIED)
                     .setMarginTop(10)
                     .setFontColor(ColorConstants.DARK_GRAY);
             document.add(legend);
-
             document.add(new Paragraph(" "));
 
+            // Tabla de datos
             Table table = new Table(new float[] { 2, 4, 4, 4 });
             table.setWidth(UnitValue.createPercentValue(100));
 
-            table.addHeaderCell(new Cell().add(new Paragraph("ID").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Nombre de Usuario").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Email").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Fecha de Registro").setBold()));
+            // Encabezados de la tabla
+            table.addHeaderCell(new Cell().add(new Paragraph("ID").setBold()).setTextAlignment(TextAlignment.CENTER));
+            table.addHeaderCell(new Cell().add(new Paragraph("Nombre de Usuario").setBold())
+                    .setTextAlignment(TextAlignment.CENTER));
+            table.addHeaderCell(
+                    new Cell().add(new Paragraph("Email").setBold()).setTextAlignment(TextAlignment.CENTER));
+            table.addHeaderCell(new Cell().add(new Paragraph("Fecha de Registro").setBold())
+                    .setTextAlignment(TextAlignment.CENTER));
 
+            // Rellenar la tabla con los datos de usuarios
             for (Usuarios usuario : usuarios) {
-                table.addCell(new Paragraph(String.valueOf(usuario.getId())));
-                table.addCell(new Paragraph(usuario.getNombreUsuario()));
-                table.addCell(new Paragraph(usuario.getEmail()));
-                table.addCell(new Paragraph(usuario.getFechaRegistro().toString()));
+                table.addCell(new Paragraph(String.valueOf(usuario.getId())).setTextAlignment(TextAlignment.CENTER));
+                table.addCell(new Paragraph(usuario.getNombreUsuario()).setTextAlignment(TextAlignment.CENTER));
+                table.addCell(new Paragraph(usuario.getEmail()).setTextAlignment(TextAlignment.CENTER));
+                table.addCell(
+                        new Paragraph(usuario.getFechaRegistro().toString()).setTextAlignment(TextAlignment.CENTER));
             }
 
             document.add(table);
 
+            // Pie de página
             Paragraph footer = new Paragraph("Reporte generado el: " + java.time.LocalDate.now())
                     .setFontSize(10)
                     .setTextAlignment(TextAlignment.RIGHT)
                     .setMarginTop(30)
                     .setFontColor(ColorConstants.GRAY);
             document.add(footer);
+
             document.close();
             return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
@@ -306,36 +350,36 @@ public class ReporteService {
 
     public ByteArrayInputStream generarReporteComentariosExcel() {
         List<Experiencia> experiencias = experienciaRepositorio.findAll();
-    
+
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Reporte de Comentarios");
-    
+
             // Agregar logo
             int logoColumnStart = 7; // Columna donde comenzará el logo
             int logoRowStart = 0; // Fila donde comenzará el logo
             int logoColumnEnd = 9; // Columna donde terminará el logo
             int logoRowEnd = 7; // Fila donde terminará el logo
-    
+
             try (InputStream inputStreamLogo = new FileInputStream("src/main/images/escudo_alcaldia.jpeg")) {
                 byte[] logoBytes = IOUtils.toByteArray(inputStreamLogo);
                 int logoIndex = workbook.addPicture(logoBytes, Workbook.PICTURE_TYPE_JPEG);
-    
+
                 Drawing<?> drawing = sheet.createDrawingPatriarch();
                 CreationHelper helper = workbook.getCreationHelper();
                 ClientAnchor anchor = helper.createClientAnchor();
-    
+
                 // Posicionar la imagen
                 anchor.setCol1(logoColumnStart);
                 anchor.setRow1(logoRowStart);
                 anchor.setCol2(logoColumnEnd);
                 anchor.setRow2(logoRowEnd);
-    
+
                 Picture pict = drawing.createPicture(anchor, logoIndex);
                 pict.resize(1); // Ajusta la escala de la imagen (modifica el valor según sea necesario)
             } catch (IOException e) {
                 logger.error("Error al agregar el logo al Excel", e);
             }
-    
+
             // Estilos personalizados
             CellStyle headerStyle = workbook.createCellStyle();
             Font headerFont = workbook.createFont();
@@ -349,14 +393,14 @@ public class ReporteService {
             headerStyle.setBorderRight(BorderStyle.THIN);
             headerStyle.setBorderLeft(BorderStyle.THIN);
             headerStyle.setAlignment(HorizontalAlignment.CENTER);
-    
+
             CellStyle dataStyle = workbook.createCellStyle();
             dataStyle.setBorderBottom(BorderStyle.THIN);
             dataStyle.setBorderTop(BorderStyle.THIN);
             dataStyle.setBorderRight(BorderStyle.THIN);
             dataStyle.setBorderLeft(BorderStyle.THIN);
             dataStyle.setAlignment(HorizontalAlignment.CENTER);
-    
+
             CellStyle dateStyle = workbook.createCellStyle();
             CreationHelper creationHelper = workbook.getCreationHelper();
             dateStyle.setDataFormat(creationHelper.createDataFormat().getFormat("dd-MM-yyyy"));
@@ -365,7 +409,7 @@ public class ReporteService {
             dateStyle.setBorderRight(BorderStyle.THIN);
             dateStyle.setBorderLeft(BorderStyle.THIN);
             dateStyle.setAlignment(HorizontalAlignment.CENTER);
-    
+
             // Título del reporte
             Row titleRow = sheet.createRow(0);
             org.apache.poi.ss.usermodel.Cell titleCell = titleRow.createCell(0);
@@ -380,7 +424,7 @@ public class ReporteService {
             titleStyle.setAlignment(HorizontalAlignment.CENTER);
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 5)); // El título se extiende de la columna 2 a la 5
-    
+
             // Leyenda explicativa
             Row legendRow = sheet.createRow(2);
             org.apache.poi.ss.usermodel.Cell legendCell = legendRow.createCell(0);
@@ -390,7 +434,7 @@ public class ReporteService {
             legendStyle.setWrapText(true);
             legendCell.setCellStyle(legendStyle);
             sheet.addMergedRegion(new CellRangeAddress(2, 2, 0, 5));
-    
+
             // Encabezados de la tabla
             Row header = sheet.createRow(4);
             String[] columnHeaders = { "ID", "Destino", "Usuario", "Calificación", "Comentario", "Fecha" };
@@ -399,44 +443,44 @@ public class ReporteService {
                 cell.setCellValue(columnHeaders[i]);
                 cell.setCellStyle(headerStyle);
             }
-    
+
             // Rellenar los datos
             int rowIdx = 5;
             for (Experiencia experiencia : experiencias) {
                 Row row = sheet.createRow(rowIdx++);
-    
+
                 org.apache.poi.ss.usermodel.Cell idCell = row.createCell(0);
                 idCell.setCellValue(experiencia.getId());
                 idCell.setCellStyle(dataStyle);
-    
+
                 org.apache.poi.ss.usermodel.Cell destinoCell = row.createCell(1);
                 destinoCell.setCellValue(experiencia.getDestino().getDestinoName());
                 destinoCell.setCellStyle(dataStyle);
-    
+
                 org.apache.poi.ss.usermodel.Cell usuarioCell = row.createCell(2);
                 usuarioCell.setCellValue(experiencia.getUsuario().getNombreUsuario());
                 usuarioCell.setCellStyle(dataStyle);
-    
+
                 org.apache.poi.ss.usermodel.Cell calificacionCell = row.createCell(3);
                 calificacionCell.setCellValue(experiencia.getCalificacion());
                 calificacionCell.setCellStyle(dataStyle);
-    
+
                 org.apache.poi.ss.usermodel.Cell comentarioCell = row.createCell(4);
                 comentarioCell.setCellValue(experiencia.getComentario());
                 comentarioCell.setCellStyle(dataStyle);
-    
+
                 org.apache.poi.ss.usermodel.Cell fechaCell = row.createCell(5);
                 if (experiencia.getFecha() != null) {
                     fechaCell.setCellValue(experiencia.getFecha());
                     fechaCell.setCellStyle(dateStyle);
                 }
             }
-    
+
             // Ajustar el tamaño de las columnas
             for (int i = 0; i < columnHeaders.length; i++) {
                 sheet.autoSizeColumn(i);
             }
-    
+
             // Escritura en el ByteArrayOutputStream
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 workbook.write(out);
@@ -446,7 +490,7 @@ public class ReporteService {
             logger.error("Error al generar el reporte de comentarios en Excel", e);
             return new ByteArrayInputStream(new byte[0]);
         }
-    }    
+    }
 
     public ByteArrayInputStream generarReporteComentariosPDF() {
         List<Experiencia> experiencias = experienciaRepositorio.findAll();
