@@ -1,7 +1,8 @@
 /*Objetivo: El propósito de este servicio es generar un reporte en formato Excel (archivo .xlsx) que contenga información sobre las 
 visitas registradas en la base de datos. El reporte se genera dinámicamente y se envía al cliente como un archivo descargable a través 
 de una respuesta HTTP.*/
-package org.example.proyecturitsexplor.Servicios; /*Paquete*/
+
+package org.example.proyecturitsexplor.Servicios;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.compress.utils.IOUtils;
@@ -23,7 +24,7 @@ import org.example.proyecturitsexplor.Entidades.Visita;
 import org.example.proyecturitsexplor.Repositorios.VisitaRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.itextpdf.commons.utils.Base64.InputStream;
+//import com.itextpdf.commons.utils.Base64.InputStream;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
@@ -34,7 +35,7 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.itextpdf.layout.Canvas;
+//import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
@@ -52,7 +53,6 @@ import com.itextpdf.kernel.events.Event;
 import java.io.FileInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import org.apache.poi.ss.usermodel.HorizontalAlignment;
 
 @Service
 public class VisitaService {
@@ -76,15 +76,94 @@ public class VisitaService {
         return visitaRepositorio.contarVisitasPorRuta();
     }
 
-    // ***Método para generar el archivo Excel***
+    // **Método para generar el archivo Excel**
     public void generarReporteExcel(List<Visita> visitas, HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Reporte de Visitas");
 
+        // Agregar logo
+        int logoColumnStart = 6; // Columna donde comenzará el logo
+        int logoRowStart = 0; // Fila donde comenzará el logo
+        int logoColumnEnd = 8; // Columna donde terminará el logo
+        int logoRowEnd = 7; // Fila donde terminará el logo
+
+        try (FileInputStream inputStreamLogo = new FileInputStream("src/main/images/escudo_alcaldia.jpeg")) {
+            byte[] logoBytes = IOUtils.toByteArray(inputStreamLogo);
+            int logoIndex = workbook.addPicture(logoBytes, Workbook.PICTURE_TYPE_JPEG);
+
+            Drawing<?> drawing = sheet.createDrawingPatriarch();
+            CreationHelper helper = workbook.getCreationHelper();
+            ClientAnchor anchor = helper.createClientAnchor();
+
+            // Posicionar la imagen
+            anchor.setCol1(logoColumnStart);
+            anchor.setRow1(logoRowStart);
+            anchor.setCol2(logoColumnEnd);
+            anchor.setRow2(logoRowEnd);
+
+            Picture pict = drawing.createPicture(anchor, logoIndex);
+            pict.resize(1); // Ajusta la escala de la imagen (modifica el valor según sea necesario)
+        } catch (IOException e) {
+            logger.error("Error al agregar el logo al Excel", e);
+        }
+
         // Estilos personalizados
-        CellStyle headerStyle = crearEstiloHeader(workbook);
-        CellStyle dataStyle = crearEstiloData(workbook);
-        CellStyle dateStyle = crearEstiloFecha(workbook);
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setFontHeightInPoints((short) 12);
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setBorderBottom(BorderStyle.THIN);
+        headerStyle.setBorderTop(BorderStyle.THIN);
+        headerStyle.setBorderRight(BorderStyle.THIN);
+        headerStyle.setBorderLeft(BorderStyle.THIN);
+        headerStyle.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
+
+        CellStyle dataStyle = workbook.createCellStyle();
+        dataStyle.setBorderBottom(BorderStyle.THIN);
+        dataStyle.setBorderTop(BorderStyle.THIN);
+        dataStyle.setBorderRight(BorderStyle.THIN);
+        dataStyle.setBorderLeft(BorderStyle.THIN);
+        dataStyle.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
+
+        CellStyle dateStyle = workbook.createCellStyle();
+        CreationHelper creationHelper = workbook.getCreationHelper();
+        dateStyle.setDataFormat(creationHelper.createDataFormat().getFormat("dd-MM-yyyy HH:mm"));
+        dateStyle.setBorderBottom(BorderStyle.THIN);
+        dateStyle.setBorderTop(BorderStyle.THIN);
+        dateStyle.setBorderRight(BorderStyle.THIN);
+        dateStyle.setBorderLeft(BorderStyle.THIN);
+        dateStyle.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
+
+        // Crear título
+        Row titleRow = sheet.createRow(0);
+        org.apache.poi.ss.usermodel.Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue("Los Tipos de Turismos Más Visitados");
+        Font titleFont = workbook.createFont();
+        titleFont.setBold(true);
+        titleFont.setFontHeightInPoints((short) 16);
+        CellStyle titleStyle = workbook.createCellStyle();
+        titleStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        titleStyle.setFont(titleFont);
+        titleStyle.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
+        titleCell.setCellStyle(titleStyle);
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 4)); // Unir celdas para el título
+
+        // Leyenda del reporte
+        Row legendRow = sheet.createRow(1);
+        org.apache.poi.ss.usermodel.Cell legendCell = legendRow.createCell(0);
+        legendCell.setCellValue("Este reporte detalla los tipos de turismos más visitados, mostrando información clave como la ruta visitada y la fecha y hora de la visita.");
+        CellStyle legendStyle = workbook.createCellStyle();
+        legendStyle.setWrapText(true); // Permitir ajuste de texto
+        legendCell.setCellStyle(legendStyle);
+        sheet.addMergedRegion(new CellRangeAddress(1, 3, 0, 4)); // Unir celdas para la leyenda
+
+        // Fila en blanco para dar espacio entre la leyenda y la tabla
+        Row emptyRow = sheet.createRow(4); // Fila vacía para espacio
+        emptyRow.createCell(0).setCellValue(""); // Solo se necesita para crear la fila
 
         // Crear encabezados
         Row headerRow = sheet.createRow(5);
@@ -100,16 +179,11 @@ public class VisitaService {
         for (Visita visita : visitas) {
             Row row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue(visita.getId());
-            row.createCell(1).setCellValue(visita.getTipoTurismo());
+            row.createCell(1).setCellValue(visita.getRutaVisitada());
 
             org.apache.poi.ss.usermodel.Cell fechaHoraCell = row.createCell(2);
             fechaHoraCell.setCellValue(visita.getFechaHoraVisita());
             fechaHoraCell.setCellStyle(dateStyle);
-
-            // Aplicar estilo a cada fila
-            for (int i = 0; i < columnHeaders.length; i++) {
-                row.getCell(i).setCellStyle(dataStyle);
-            }
         }
 
         // Autoajustar el tamaño de las columnas
@@ -122,44 +196,6 @@ public class VisitaService {
         response.setHeader("Content-Disposition", "attachment; filename=reporte_visitas.xlsx");
         workbook.write(response.getOutputStream());
         workbook.close();
-    }
-
-    private CellStyle crearEstiloHeader(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        Font font = workbook.createFont();
-        font.setBold(true);
-        font.setFontHeightInPoints((short) 12);
-        style.setFont(font);
-        style.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
-        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
-        return style;
-    }
-
-    private CellStyle crearEstiloData(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
-        return style;
-    }
-
-    private CellStyle crearEstiloFecha(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        CreationHelper creationHelper = workbook.getCreationHelper();
-        style.setDataFormat(creationHelper.createDataFormat().getFormat("dd-MM-yyyy HH:mm"));
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
-        return style;
     }
 
     public void generarReportePDF(List<Visita> visitas, HttpServletResponse response) throws IOException {
@@ -239,7 +275,7 @@ public class VisitaService {
             table.addCell(new Cell().add(new Paragraph(String.valueOf(visita.getId())))
                     .setTextAlignment(TextAlignment.CENTER));
             table.addCell(
-                    new Cell().add(new Paragraph(visita.getTipoTurismo())).setTextAlignment(TextAlignment.CENTER));
+                    new Cell().add(new Paragraph(visita.getRutaVisitada())).setTextAlignment(TextAlignment.CENTER));
             table.addCell(new Cell().add(new Paragraph(visita.getFechaHoraVisita().toString()))
                     .setTextAlignment(TextAlignment.CENTER));
         }
