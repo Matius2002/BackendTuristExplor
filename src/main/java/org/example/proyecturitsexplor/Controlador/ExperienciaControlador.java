@@ -9,9 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+
 @Controller
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin //(origins = "http://localhost:8080")
 public class ExperienciaControlador {
     @Autowired
     private ExperienciaRepositorio experienciaRepositorio;

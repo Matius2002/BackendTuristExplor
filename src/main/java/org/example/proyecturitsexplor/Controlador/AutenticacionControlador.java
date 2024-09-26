@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller //Define esta clase como un controlador de Spring MVC, capaz de manejar solicitudes HTTP.
 @RequestMapping("/api") //Especifica que todas las rutas dentro de esta clase estarán prefijadas con /api.
-@CrossOrigin(origins = "http://localhost:8080") //Permite solicitudes CORS (Cross-Origin Resource Sharing) desde http://localhost:8080,
+@CrossOrigin //(origins = "http://localhost:8080") //Permite solicitudes CORS (Cross-Origin Resource Sharing) desde http://localhost:8080,
 
 public class AutenticacionControlador {
 

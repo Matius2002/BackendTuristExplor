@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 @Controller
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin //(origins = "http://localhost:8080")
 public class EventosControlador {
     @SuppressWarnings("unused")
     @Autowired

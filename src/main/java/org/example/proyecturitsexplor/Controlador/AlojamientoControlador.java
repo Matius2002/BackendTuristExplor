@@ -14,7 +14,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/api") // Define la ruta base para todos los endpoints de este controlador
-@CrossOrigin(origins = "http://localhost:8080") // Permite solicitudes desde el origen especificado (CORS)
+@CrossOrigin //(origins = "http://localhost:8080") // Permite solicitudes desde el origen especificado (CORS)
 public class AlojamientoControlador {
 
     // Inyección de dependencias mediante @Autowired para acceder al repositorio y servicio de alojamientos

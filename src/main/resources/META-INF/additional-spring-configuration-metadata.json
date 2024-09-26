@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "security.jwt.expiration-in-minutes",
+    "type": "java.lang.String",
+    "description": "A description for 'security.jwt.expiration-in-minutes'"
+  },
+  {
+    "name": "app.security.jwt.expiration-in-minutes",
+    "type": "java.lang.String",
+    "description": "A description for 'app.security.jwt.expiration-in-minutes'"
+  },
+  {
+    "name": "spring.security.jwt.expiration-in-minutes",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.security.jwt.expiration-in-minutes'"
+  }
+]}

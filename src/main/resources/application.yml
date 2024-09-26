@@ -4,9 +4,9 @@ spring:
     name: ProyecTuritsExplor
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/TuristExplor
+    url: jdbc:postgresql://turistexplor.c788u86imhde.us-east-2.rds.amazonaws.com:5432/postgres_bd
     username: postgres
-    password: 1234
+    password: turistexplor
   jpa:
     properties:
       hibernate:

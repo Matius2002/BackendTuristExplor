@@ -17,9 +17,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+
 @Controller
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin //(origins = "http://localhost:8080")
 public class ImagesControlador {
     @SuppressWarnings("unused")
     @Autowired

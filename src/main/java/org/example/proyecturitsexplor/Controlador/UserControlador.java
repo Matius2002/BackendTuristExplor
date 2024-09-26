@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin //(origins = "http://localhost:8080")
 public class UserControlador {
     @SuppressWarnings("unused")
     @Autowired
